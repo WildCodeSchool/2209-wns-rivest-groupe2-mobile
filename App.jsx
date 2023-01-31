@@ -1,16 +1,19 @@
 import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { StyleSheet } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Home from "./src/screens/Home";
 import Likes from "./src/screens/Likes";
 import MyAccount from "./src/screens/MyAccount";
+import { Provider as PaperProvider } from 'react-native-paper';
+
+
 
 const Tab = createBottomTabNavigator();
 
 export default function App() {
   return (
+    <PaperProvider>
     <NavigationContainer >
       <Tab.Navigator  
     
@@ -33,10 +36,7 @@ export default function App() {
             return <Ionicons name={iconName} size={size} color={color} />;
           },
           tabBarActiveTintColor: "#EB571F",
-          tabBarInactiveTintColor: "white",
-          
-          
-          
+          tabBarInactiveTintColor: "white", 
         })}
       >
         <Tab.Screen
@@ -48,6 +48,7 @@ export default function App() {
         <Tab.Screen name="My Account" component={MyAccount} />
       </Tab.Navigator>
     </NavigationContainer>
+    </PaperProvider>
   );
 }
 
