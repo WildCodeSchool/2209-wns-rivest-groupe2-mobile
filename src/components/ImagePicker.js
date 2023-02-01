@@ -20,6 +20,7 @@ export default function AvatarImagePicker(){
     
         if (!result.canceled) {
           setImage(result.assets[0].uri);
+          setModalOpen(false)
         }
       };
 
@@ -35,6 +36,7 @@ export default function AvatarImagePicker(){
     
         if (!result.canceled) {
           setImage(result.assets[0].uri);
+          setModalOpen(false)
         }
       };
 
