@@ -8,7 +8,6 @@ import MyAccount from "./src/screens/MyAccount";
 import { Provider as PaperProvider } from 'react-native-paper';
 
 
-
 const Tab = createBottomTabNavigator();
 
 export default function App() {
@@ -16,7 +15,6 @@ export default function App() {
     <PaperProvider>
     <NavigationContainer >
       <Tab.Navigator  
-    
         screenOptions={({ route }) => ({
           tabBarStyle: { backgroundColor:'#009FA1' },
 
@@ -47,6 +45,7 @@ export default function App() {
         <Tab.Screen name="Favorites" component={Likes} />
         <Tab.Screen name="My Account" component={MyAccount} />
       </Tab.Navigator>
+     
     </NavigationContainer>
     </PaperProvider>
   );
