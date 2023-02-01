@@ -12,7 +12,6 @@ function Home() {
   selectedValue={selectedCity}
   onValueChange={(itemValue) =>
    {setSelectedCity(itemValue)
-  
    if(itemValue ==='bordeaux'){
     setImage(require('../../assets/bodeaux-map.png'))
    }
@@ -26,12 +25,9 @@ function Home() {
 </Picker>
         <View style={styles.imageContainer}>
      
-     <Image source={image} style={styles.image}>
- 
- 
-     </Image>
+          <Image source={image} style={styles.image} />
     
-   </View>
+    </View>
     </View>
     
     
