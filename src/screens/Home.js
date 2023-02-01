@@ -5,24 +5,24 @@ import { View, Image, StyleSheet } from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 
 function Home() {
-  const [selectedCity, setSelectedCity] = useState(require('../../assets/paris-map.png'));
-  const [image, setImage] =useState()
+  const [selectedCity, setSelectedCity] = useState();
+  const [image, setImage] = useState(require('../../assets/paris-map.png'))
     return  <View style={styles.container}>
-            <Picker style={styles.picker} mode='dropdown' placeholder="Please choose a city"
-                selectedValue={selectedCity}
-                onValueChange={(itemValue) =>
-                {setSelectedCity(itemValue)
-                  if(itemValue ==='bordeaux'){
-                     setImage(require('../../assets/bodeaux-map.png'))
-                  }
-                  if(itemValue ==='paris'){
-                      setImage(require('../../assets/paris-map.png'))
-                  }
-                } 
-              }>
-            <Picker.Item label="Paris" value="paris" />
-            <Picker.Item label="Bordeaux" value="bordeaux" />
-            </Picker>
+  <Picker style={styles.picker} mode='dropdown' placeholder="Please choose a city"
+  selectedValue={selectedCity}
+  onValueChange={(itemValue) =>
+   {setSelectedCity(itemValue)
+   if(itemValue ==='bordeaux'){
+    setImage(require('../../assets/bodeaux-map.png'))
+   }
+   if(itemValue ==='paris'){
+    setImage(require('../../assets/paris-map.png'))
+   }
+} 
+  }>
+  <Picker.Item label="Paris" value="paris" />
+  <Picker.Item label="Bordeaux" value="bordeaux" />
+</Picker>
         <View style={styles.imageContainer}>
      
           <Image source={image} style={styles.image} />
