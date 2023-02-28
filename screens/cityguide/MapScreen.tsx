@@ -67,17 +67,19 @@ const MapScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <MapView style={styles.map} initialRegion={parisPosition}>
-        {pois.map((poi) => (
-          <Marker
-            coordinate={{
-              latitude: poi.coordinates[0],
-              longitude: poi.coordinates[1],
-            }}
-            title={poi.name}
-            description={poi.description}
-            key={poi.id}
-          />
-        ))}
+        {pois
+          ? pois.map((poi) => (
+              <Marker
+                coordinate={{
+                  latitude: poi.coordinates[0],
+                  longitude: poi.coordinates[1],
+                }}
+                title={poi.name}
+                description={poi.description}
+                key={poi.id}
+              />
+            ))
+          : null}
       </MapView>
     </View>
   );
