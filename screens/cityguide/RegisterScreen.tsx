@@ -1,31 +1,44 @@
 import * as React from "react";
 import * as yup from "yup";
-import {
-  SafeAreaView,
-  View,
-  ScrollView,
-  StyleSheet,
-} from "react-native";
-import { Controller, useForm } from "react-hook-form";
+import { gql, useMutation } from "@apollo/client";
+import { SafeAreaView, View, ScrollView, Text, StyleSheet } from "react-native";
+import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Logo from "../../assets/images/city-guide-logo.svg";
 import Button from "../../components/Button";
 import InputGroup from "../../components/InputGroup";
+import * as SecureStore from "expo-secure-store";
+import { useRecoilState } from "recoil";
+import { userState } from "../../atom/userAtom";
+import { IUser } from "../../types/IUser";
+import { Link  } from '@react-navigation/native';
 
-interface CreateAccountProps {}
+//interface CreateAccountProps {}
 
-type FormValues = {
-  name: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
+// MUTATION APOLLO
+const CREATE_USER = gql`
+  mutation Mutation($email: String!, $password: String!) {
+    createUser(email: $email, password: $password) {
+      token
+      userFromDB {
+        id
+        email
+        username
+        type
+        firstname
+        lastname
+        hashedPassword
+        profilePicture
+      }
+    }
+  }
+`;
 
-const RegisterScreen: React.FC<CreateAccountProps> = () => {
+const RegisterScreen: React.FC = ({ navigation }: any) => {
+
   // VALIDATION SCHEMA
   const validationSchema = yup
     .object({
-      name: yup.string().required("Veuillez saisir votre nom"),
       email: yup
         .string()
         .email()
@@ -39,62 +52,78 @@ const RegisterScreen: React.FC<CreateAccountProps> = () => {
         .required("Veuillez saisir un mot de passe"),
       confirmPassword: yup
         .string()
-        .oneOf([yup.ref("password"), null], "Passwords do not match."),
+        .oneOf(
+          [yup.ref("password"), null],
+          "Les mots de passe ne correspondent pas"
+        ),
     })
     .required();
+
+  // RECOIL
+  const [user, setUser] = useRecoilState(userState);
+
+  // FN SECURE STORE
+  async function saveTokenInSecureStore(key: string, value: string) {
+    await SecureStore.setItemAsync(key, value);
+  }
+
+  // MUTATION - SUBMISSION
+  const [signUp] = useMutation(CREATE_USER, {
+    onCompleted(data) {
+      saveTokenInSecureStore("token", data.createUser.token);
+      setUser(data.createUser);
+      navigation.navigate("Profile");
+    },
+    onError(error: any) {
+      console.log(error);
+    },
+  });
+
+  const onSubmit: SubmitHandler<IUser> = async (fields: {
+    email: string;
+    password: string;
+  }) => {
+    signUp({
+      variables: {
+        email: fields.email,
+        password: fields.password,
+      },
+    });
+  };
 
   const {
     control,
     handleSubmit,
     clearErrors,
     formState: { errors },
-  } = useForm<FormValues>({
+  } = useForm<IUser>({
     mode: "onBlur",
     resolver: yupResolver(validationSchema),
   });
 
-  const onSubmit = (data) => {
-    clearErrors();
-    console.log(data);
-  };
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
-        <Controller
-          control={control}
-          name="name"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <InputGroup
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Nom"
-              error={!!error}
-              errorDetails={error?.message}
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="email"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <InputGroup
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Email"
-              error={!!error}
-              errorDetails={error?.message}
-            />
-          )}
-        />
+        <View>
+          <Text style={styles.title}>Créez votre compte</Text>
+        </View>
+          <Controller
+            control={control}
+            name="email"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <InputGroup
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Email"
+                error={!!error}
+                errorDetails={error?.message}
+              />
+            )}
+          />
         <Controller
           control={control}
           name="password"
@@ -109,6 +138,7 @@ const RegisterScreen: React.FC<CreateAccountProps> = () => {
               placeholder="Mot de passe"
               error={!!error}
               errorDetails={error?.message}
+              //password
             />
           )}
         />
@@ -126,12 +156,19 @@ const RegisterScreen: React.FC<CreateAccountProps> = () => {
               placeholder="Confirmer le mot de passe"
               error={!!error}
               errorDetails={error?.message}
+              //password
             />
           )}
         />
         <View>
-          <Button onPress={handleSubmit(onSubmit)}>Créer mon compte</Button>
+          <Button onPress={handleSubmit(onSubmit)}>S'INSCRIRE</Button>
         </View>
+        <Text style={{ textAlign: "center", color: "#ffffff" , marginTop: 20 }}>
+            Déjà membre ?{" "}
+            <Link style={{ color: "#2ECE65" }} to={{ screen: "Profile" }}>
+              Connexion
+            </Link>
+          </Text>
       </ScrollView>
     </SafeAreaView>
   );
@@ -140,14 +177,27 @@ const RegisterScreen: React.FC<CreateAccountProps> = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingTop: 60,
     padding: 20,
-    backgroundColor: "#44bdbe",
+    width: "100%",
+    justifyContent: "center",
+    marginLeft: "auto",
+    marginRight: "auto",
+    backgroundColor: "#072428",
+  },
+  email: {
+    position: "relative",
+    width: "100%",
+  },
+  icon: {
+    position: "absolute",
   },
   title: {
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 30,
-    paddingBottom: 15,
+    paddingBottom: 30,
+    color: "#fff",
   },
   whiteContrast: {
     color: "#fff",

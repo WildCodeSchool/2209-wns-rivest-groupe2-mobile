@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface InputGroupProps {
   label?: string;
@@ -40,6 +41,7 @@ const InputGroup: React.FunctionComponent<InputGroupProps> = ({
         secureTextEntry={password}
         keyboardType={type}
       />
+      {/* <Ionicons name="map" color="#000" size={14} style={styles.icon}/> */}
       {!!errorDetails && <Text style={styles.errorDetails}>{errorDetails}</Text>}
     </View>
   );
@@ -49,8 +51,7 @@ export default InputGroup;
 
 const styles = StyleSheet.create({
   main: {
-    // paddingTop: "0.5rem",
-    // paddingBottom: "0.5rem",
+    justifyContent: 'center',
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -61,10 +62,15 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
   },
+  // icon: {
+  //   position: 'absolute',
+  //   right: 40,
+  //   height: 35,
+  // },
   errorDetails: {
-    //marginTop: "0.25rem",
     color: "#EF4444",
-    //fontSize: "0.875rem",
-    //lineHeight: "1.25rem",
+    marginLeft: 25,
+    marginRight: 25,
+    padding: 5,
   },
 });

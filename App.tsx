@@ -13,7 +13,7 @@ export default function App() {
 
   const uri =
     manifest?.debuggerHost &&
-    `http://${manifest.debuggerHost.split(":").shift()}:5000`;
+    `http://${manifest.debuggerHost.split(":").shift()}:5001`;
   const httpLink = createHttpLink({
     uri: uri,
   });

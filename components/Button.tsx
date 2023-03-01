@@ -19,6 +19,8 @@ const Button: React.FC<ButtonProps>= ({
         <LinearGradient
           colors={["#34D399", "#3B82F6"]}
           style={styles.button}
+          start={{x:0, y:0}}
+          end={{x:1, y:1}}
         >
           <Text style={styles.buttonInner}>{children}</Text>
         </LinearGradient>
@@ -40,5 +42,12 @@ const styles = StyleSheet.create({
   },
   buttonInner: {
     color: "white",
+    marginLeft: "auto",
+    marginRight: "auto",
+    marginBottom: "auto",
+    marginTop: "auto",
+    fontSize: 17,
+    fontWeight: "bold",
+    letterSpacing:3,
   },
 });

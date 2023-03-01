@@ -4,10 +4,10 @@ import RegisterScreen from '../screens/cityguide/RegisterScreen';
 
 const Stack = createStackNavigator();
 
-const ProfileNavigator = () => {
+const ProfileNavigator: React.FC = () => {
   return (
       <Stack.Navigator >
-          <Stack.Screen name="RegisterScreen" component={RegisterScreen} />
+          <Stack.Screen name="Je créé mon compte" component={RegisterScreen} />
       </Stack.Navigator>
   )
 }

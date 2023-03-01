@@ -9,12 +9,7 @@ import ProfileScreen from "../screens/cityguide/ProfileScreen";
 
 export type BottomTabParamList = {
   Map: undefined;
-  Profile: {
-    id: string;
-    title: string;
-    description: string;
-    image: string;
-  };
+  Profile: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
