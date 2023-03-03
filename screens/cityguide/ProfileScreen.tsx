@@ -1,104 +1,107 @@
-import { Stack, Text, TextInput, Button } from "@react-native-material/core";
+import { Stack, TextInput, Button } from "@react-native-material/core";
 import React from "react";
-import {
-  Image,
-  SafeAreaView,
-  View,
-  ScrollView,
-  StyleSheet,
-  StatusBar,
-  TouchableOpacity,
-  ImageBackground,
-} from "react-native";
-import Logo from "../../assets/images/city-guide-logo.svg";
+import { Image, SafeAreaView, View, StyleSheet } from "react-native";
+import { Avatar, Card, Text, IconButton, Modal } from "react-native-paper";
+import { Ionicons } from "@expo/vector-icons";
+import AvatarImagePicker from "../../components/AvatarImagePicker";
+import * as SecureStore from "expo-secure-store";
+import { useNavigation } from "@react-navigation/native";
+import { useRecoilState, useResetRecoilState } from "recoil";
+import { userState } from "../../atom/userAtom";
 
 const ProfileScreen: React.FC = ({ navigation }: any) => {
+  const [modalOpen, setModalOpen] = React.useState(false);
+
+  const [userTest, setUserTest] = React.useState({
+    firstName: "New",
+    lastName: "NewLast",
+    email: "qkfjkbgz@gmail.com",
+    phoneNumber: "003442974824",
+  });
+
+  const updatedUser = (values) => {
+    setUserTest({
+      firstName: values.firstName,
+      lastName: values.lastName,
+      email: values.email,
+      phoneNumber: values.phoneNumber,
+    });
+  };
+
+  const logout = async () => {
+    const deletetoken = await SecureStore.deleteItemAsync("token");
+    console.log("=======> DELETE TOKEN : ", deletetoken);
+    resetList
+    navigation.navigate("Map");
+  };
+
+  const resetList = useResetRecoilState(userState);
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
-        <ImageBackground
-          source={require("../../assets/images/bg-splash.jpg")}
-          resizeMode="cover"
-          style={styles.image}
-        >
-          <View style={styles.overlay} />
-          <View style={styles.wrapper}>
-            <View style={styles.logo}>
-              <Logo width={300} height={60} />
+      <View>
+        <View>
+          <AvatarImagePicker />
+
+          <View>
+            <View>
+              <Ionicons name="medal-outline" size={20} />
+              <Text> User type</Text>
             </View>
-            <Button
-              title="Découvrir"
-              color="#44bdbe"
-              tintColor="#fff"
-              onPress={() => {
-                navigation.navigate("ProfileNavigator");
-              }}
-              style={styles.button}
-            />
+            <View>
+              <Ionicons name="star-outline" size={20} />
+              <Text> User rating</Text>
+            </View>
           </View>
-        </ImageBackground>
-
-        {/* <View style={styles.imageContainer}>
-          <Logo width={300} height={60} />
         </View>
-        <Text style={styles.title}>
-          Trouver les meilleurs plans
-        </Text>
 
-        <Text variant="body1" style={styles.body}>
-          Suivez vos activités carbone, montrez vos progrès à vos amis et
-          profitez des bons plans partagés au quotidien.
-        </Text>
-        <Button
-          title="Je me connecte"
-          color="#003c49"
-          tintColor="#fff"
-          style={{ margin: 10 }}
-          onPress={() => {
-            navigation.navigate("CityGuideScreen");
-          }}
-        />
-        <Button
-          title="Je créé mon compte"
-          color="#44bdbe"
-          tintColor="#fff"
-          style={{ margin: 10 }}
-          onPress={() => {
-            navigation.navigate("CityGuideScreen");
-          }}
-        />
-        <View
-          style={{
-            backgroundColor: "#003c49",
-            marginTop: 50,
-            paddingTop: 25,
-            paddingBottom: 25,
-            paddingLeft: 15,
-            paddingRight: 15,
-          }}
-        >
-          <Text style={[styles.title, styles.whiteContrast]}>
-            Ici, les meilleurs bons plans !
-          </Text>
-          <View style={styles.imageContainer}>
-            <Logo width={300} height={60} />
-          </View>
-          <Text variant="body1" style={{ color: "#fff", margin: 20 }}>
-            Chaque jour des nouveaux bons plans carbone à découvrir !
-          </Text>
-          <Button
-            title="Voir les bons plans"
-            color="#17b2aa"
-            tintColor="#fff"
-            onPress={() => {
-              navigation.navigate("CityGuideScreen");
-            }}
+        <Card>
+          <Card.Title
+            title="User Info"
+            subtitle="User description"
+            titleVariant="titleMedium"
+            right={(props) => (
+              <IconButton
+                {...props}
+                icon="pencil"
+                size={20}
+                onPress={() => setModalOpen(true)}
+              />
+            )}
           />
-        </View>
-        <Text style={{ textAlign: "center", margin: 20 }}>
-          WildCarbon © 2023
-        </Text> */}
-      </ScrollView>
+          <Card.Content>
+            <Text>
+              <Text>User first name:</Text> {userTest.firstName}
+            </Text>
+            <Text>
+              <Text>User last name:</Text> {userTest.lastName}
+            </Text>
+            <Text>
+              <Text>User email:</Text> {userTest.email}
+            </Text>
+            <Text>
+              <Text>User phone number:</Text> {userTest.phoneNumber}
+            </Text>
+            <Text>
+              <Text>Interests:</Text> #keywords #keywords #keywords #keywords
+              #keywords #keywords
+            </Text>
+          </Card.Content>
+        </Card>
+
+        <Modal visible={modalOpen}>
+          <View style={styles.modalContent}>
+            <Ionicons
+              name="close"
+              size={24}
+              style={{ ...styles.modalToggle, ...styles.modalClose }}
+              onPress={() => setModalOpen(false)}
+            />
+            {/* <EditProfile user={user} updatedUser={updatedUser} /> */}
+          </View>
+        </Modal>
+        <Button onPress={() => logout()} title={"Logout"} />
+      </View>
     </SafeAreaView>
   );
 };
@@ -106,34 +109,27 @@ const ProfileScreen: React.FC = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
-  scrollView: {
-    marginHorizontal: 0,
+  loginForm: {
+    flex: 1,
+  },
+  modalContent: {
+    flex: 1,
+  },
+  modalToggle: {
+    flex: 1,
+  },
+  modalClose: {
+    flex: 1,
   },
   title: {
     fontWeight: "bold",
     textAlign: "center",
     fontSize: 30,
-
     paddingBottom: 15,
   },
   whiteContrast: {
     color: "#fff",
-  },
-  body: {
-    textAlign: "center",
-    margin: 10,
-  },
-  imageContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  logo: {
-    resizeMode: "contain",
-    flex: 0.8,
-    aspectRatio: 2.5,
   },
 });
 

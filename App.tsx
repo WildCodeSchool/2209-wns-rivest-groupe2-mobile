@@ -7,6 +7,8 @@ import {
 import Constants from "expo-constants";
 import Navigator from "./navigation/Navigator";
 import { RecoilRoot } from "recoil";
+import React from "react";
+import { Provider as PaperProvider } from 'react-native-paper';
 
 export default function App() {
   const { manifest } = Constants;
@@ -26,7 +28,9 @@ export default function App() {
   return (
     <ApolloProvider client={client}>
       <RecoilRoot>
-        <Navigator />
+        <PaperProvider>
+          <Navigator />
+        </PaperProvider>
       </RecoilRoot>
     </ApolloProvider>
   );

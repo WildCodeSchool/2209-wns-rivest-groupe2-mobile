@@ -5,6 +5,7 @@ import Splash from '../screens/Splash'
 import CityGuideScreen from '../screens/cityguide/CityGuideScreen';
 import ProfileScreen from '../screens/cityguide/ProfileScreen';
 import ProfileNavigator from './ProfileNavigator';
+import RegisterScreen from '../screens/cityguide/RegisterScreen';
 
 const Stack = createStackNavigator();
 

@@ -1,7 +1,15 @@
 import * as React from "react";
 import * as yup from "yup";
 import { gql, useMutation } from "@apollo/client";
-import { SafeAreaView, View, ScrollView, Text, StyleSheet } from "react-native";
+import {
+  SafeAreaView,
+  View,
+  ScrollView,
+  Text,
+  StyleSheet,
+  ImageBackground,
+  TouchableOpacity,
+} from "react-native";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import Logo from "../../assets/images/city-guide-logo.svg";
@@ -11,7 +19,8 @@ import * as SecureStore from "expo-secure-store";
 import { useRecoilState } from "recoil";
 import { userState } from "../../atom/userAtom";
 import { IUser } from "../../types/IUser";
-import { Link  } from '@react-navigation/native';
+import { Link } from "@react-navigation/native";
+import { ROUTES } from "../../constants";
 
 //interface CreateAccountProps {}
 
@@ -34,8 +43,12 @@ const CREATE_USER = gql`
   }
 `;
 
-const RegisterScreen: React.FC = ({ navigation }: any) => {
+// FN SECURE STORE
+async function saveTokenInSecureStore(key: string, value: string) {
+  await SecureStore.setItemAsync(key, value);
+}
 
+const RegisterScreen: React.FC = ({ navigation }: any) => {
   // VALIDATION SCHEMA
   const validationSchema = yup
     .object({
@@ -62,17 +75,13 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
   // RECOIL
   const [user, setUser] = useRecoilState(userState);
 
-  // FN SECURE STORE
-  async function saveTokenInSecureStore(key: string, value: string) {
-    await SecureStore.setItemAsync(key, value);
-  }
-
   // MUTATION - SUBMISSION
   const [signUp] = useMutation(CREATE_USER, {
     onCompleted(data) {
       saveTokenInSecureStore("token", data.createUser.token);
       setUser(data.createUser);
-      navigation.navigate("Profile");
+      navigation.navigate(ROUTES.PROFILE)
+      //navigation.navigate("Profile");
     },
     onError(error: any) {
       console.log(error);
@@ -102,95 +111,123 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <View>
-          <Text style={styles.title}>Créez votre compte</Text>
-        </View>
-          <Controller
-            control={control}
-            name="email"
-            render={({
-              field: { onChange, onBlur, value },
-              fieldState: { error },
-            }) => (
-              <InputGroup
-                onBlur={onBlur}
-                onChangeText={onChange}
-                value={value}
-                placeholder="Email"
-                error={!!error}
-                errorDetails={error?.message}
+    <SafeAreaView style={styles.main}>
+      <ImageBackground
+        source={require("../../assets/images/bg-register.jpg")}
+        resizeMode="cover"
+        style={styles.image}
+      >
+        <View style={styles.overlay} />
+
+        {/******************** FORM *********************/}
+
+        <ScrollView>
+          <View style={styles.container}>
+            <View style={styles.wFull}>
+              <View>
+                <Text style={styles.title}>Créez votre compte</Text>
+              </View>
+              <Controller
+                control={control}
+                name="email"
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { error },
+                }) => (
+                  <InputGroup
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Email"
+                    error={!!error}
+                    errorDetails={error?.message}
+                  />
+                )}
               />
-            )}
-          />
-        <Controller
-          control={control}
-          name="password"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <InputGroup
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Mot de passe"
-              error={!!error}
-              errorDetails={error?.message}
-              //password
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="confirmPassword"
-          render={({
-            field: { onChange, onBlur, value },
-            fieldState: { error },
-          }) => (
-            <InputGroup
-              onBlur={onBlur}
-              onChangeText={onChange}
-              value={value}
-              placeholder="Confirmer le mot de passe"
-              error={!!error}
-              errorDetails={error?.message}
-              //password
-            />
-          )}
-        />
-        <View>
-          <Button onPress={handleSubmit(onSubmit)}>S'INSCRIRE</Button>
-        </View>
-        <Text style={{ textAlign: "center", color: "#ffffff" , marginTop: 20 }}>
-            Déjà membre ?{" "}
-            <Link style={{ color: "#2ECE65" }} to={{ screen: "Profile" }}>
-              Connexion
-            </Link>
-          </Text>
-      </ScrollView>
+              <Controller
+                control={control}
+                name="password"
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { error },
+                }) => (
+                  <InputGroup
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Mot de passe"
+                    error={!!error}
+                    errorDetails={error?.message}
+                    //password
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { error },
+                }) => (
+                  <InputGroup
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Confirmer le mot de passe"
+                    error={!!error}
+                    errorDetails={error?.message}
+                    //password
+                  />
+                )}
+              />
+              <View>
+                <Button onPress={handleSubmit(onSubmit)}>S'INSCRIRE</Button>
+              </View>
+            </View>
+
+            {/******************** FOOTER *********************/}
+
+            <View style={styles.footer}>
+              <View>
+                <Text style={styles.footerText}>
+                  Déjà un compte CityGuide ?
+                </Text>
+              </View>
+              <View>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate(ROUTES.LOGIN)}
+                >
+                  <Text style={styles.signupBtn}>Se connecter 😀</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </ScrollView>
+      </ImageBackground>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  main: {
     flex: 1,
-    paddingTop: 60,
-    padding: 20,
-    width: "100%",
     justifyContent: "center",
-    marginLeft: "auto",
-    marginRight: "auto",
-    backgroundColor: "#072428",
+    alignItems: "center",
   },
-  email: {
-    position: "relative",
+  // FORM
+  container: {
+    padding: 15,
     width: "100%",
+    alignItems: "center",
+    justifyContent: "center",
   },
-  icon: {
-    position: "absolute",
+  scroll: {
+    width: "100%",
+    padding: 10,
+  },
+  wFull: {
+    width: "100%",
+    marginBottom: 100,
   },
   title: {
     fontWeight: "bold",
@@ -198,23 +235,42 @@ const styles = StyleSheet.create({
     fontSize: 30,
     paddingBottom: 30,
     color: "#fff",
+    padding: 30,
+    marginTop: 80,
   },
-  whiteContrast: {
-    color: "#fff",
-  },
-  body: {
-    textAlign: "center",
-    margin: 10,
-  },
-  imageContainer: {
-    flexDirection: "row",
-    justifyContent: "center",
+  // FOOTER
+  footer: {
+    position: "absolute",
+    bottom: 0,
     alignItems: "center",
+    flexDirection: "column",
   },
-  logo: {
-    resizeMode: "contain",
-    flex: 0.8,
-    aspectRatio: 2.5,
+  footerText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  signupBtn: {
+    color: "#0fa6a6",
+    marginTop: 5,
+    fontWeight: "bold",
+  },
+  // BACKGROUND
+  image: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    resizeMode: "cover",
+    width: "100%",
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: "center",
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.803)",
   },
 });
 
