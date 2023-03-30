@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import InputGroup from "../../components/InputGroup";
@@ -43,6 +43,13 @@ async function saveTokenInSecureStore(key: string, value: string) {
 }
 
 const LoginScreen = ({ navigation }) => {
+  // DISABLE TOP NAVIGATION
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, []);
+
   // VALIDATION SCHEMA
   const validationSchema = yup
     .object({
@@ -62,13 +69,12 @@ const LoginScreen = ({ navigation }) => {
 
   // RECOIL
   const [user, setUser] = useRecoilState(userState);
-  console.log("=======> USER(LOGINSCREEN): ", user)
-
+  //console.log("=======> USER(LOGINSCREEN): ", user)
 
   // MUTATION - SUBMISSION
   const [signIn] = useLazyQuery(GET_TOKEN, {
     onCompleted(data) {
-      //console.log("========== data", data)
+      console.log("==========> data", data);
       saveTokenInSecureStore("token", data.getToken.token);
       setUser(data.getToken);
       navigation.navigate("Profile");

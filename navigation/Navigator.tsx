@@ -3,7 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import Splash from '../screens/Splash'
 import CityGuideScreen from '../screens/cityguide/CityGuideScreen';
-import ProfileScreen from '../screens/cityguide/ProfileScreen';
+import ProfileScreen from '../screens/cityguide/MyProfileScreen';
 import ProfileNavigator from './ProfileNavigator';
 import RegisterScreen from '../screens/cityguide/RegisterScreen';
 

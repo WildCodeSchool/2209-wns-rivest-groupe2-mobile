@@ -1,13 +1,13 @@
-import React from "react";
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { Avatar, Button, Modal, Portal, } from 'react-native-paper';
 import * as ImagePicker from 'expo-image-picker';
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useState } from 'react';
 
 function AvatarImagePicker(){
-    const [modalOpen, setModalOpen] = React.useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
 
-    const [image, setImage] = React.useState(null);
+    const [image, setImage] = useState(null);
     const launchImageLibrary = async () => {
         let result = await ImagePicker.launchImageLibraryAsync({
           mediaTypes: ImagePicker.MediaTypeOptions.All,

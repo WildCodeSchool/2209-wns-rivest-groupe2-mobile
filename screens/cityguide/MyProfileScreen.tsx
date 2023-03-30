@@ -1,5 +1,5 @@
 import { Stack, TextInput, Button } from "@react-native-material/core";
-import React from "react";
+import React, { useLayoutEffect } from "react";
 import { Image, SafeAreaView, View, StyleSheet } from "react-native";
 import { Avatar, Card, Text, IconButton, Modal } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
@@ -9,8 +9,10 @@ import { useNavigation } from "@react-navigation/native";
 import { useRecoilState, useResetRecoilState } from "recoil";
 import { userState } from "../../atom/userAtom";
 
-const ProfileScreen: React.FC = ({ navigation }: any) => {
+const MyProfileScreen: React.FC = ({ navigation }: any) => {
   const [modalOpen, setModalOpen] = React.useState(false);
+  const [user, setUser] = useRecoilState(userState);
+  const resetUserState = useResetRecoilState(userState);
 
   const [userTest, setUserTest] = React.useState({
     firstName: "New",
@@ -18,6 +20,13 @@ const ProfileScreen: React.FC = ({ navigation }: any) => {
     email: "qkfjkbgz@gmail.com",
     phoneNumber: "003442974824",
   });
+
+  // DISABLE TOP NAVIGATION
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, []);
 
   const updatedUser = (values) => {
     setUserTest({
@@ -28,14 +37,12 @@ const ProfileScreen: React.FC = ({ navigation }: any) => {
     });
   };
 
+  // LOGOUT
   const logout = async () => {
-    const deletetoken = await SecureStore.deleteItemAsync("token");
-    console.log("=======> DELETE TOKEN : ", deletetoken);
-    resetList
+    const deleteToken = await SecureStore.deleteItemAsync("token");
+    resetUserState();
     navigation.navigate("Map");
   };
-
-  const resetList = useResetRecoilState(userState);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -100,7 +107,7 @@ const ProfileScreen: React.FC = ({ navigation }: any) => {
             {/* <EditProfile user={user} updatedUser={updatedUser} /> */}
           </View>
         </Modal>
-        <Button onPress={() => logout()} title={"Logout"} />
+        <Button onPress={logout} title={"Se déconnecter"} />
       </View>
     </SafeAreaView>
   );
@@ -133,4 +140,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileScreen;
+export default MyProfileScreen;

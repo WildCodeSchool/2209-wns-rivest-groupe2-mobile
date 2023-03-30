@@ -6,11 +6,10 @@ import { Ionicons } from "@expo/vector-icons";
 import MapScreen from "../screens/cityguide/MapScreen";
 import ProfileNavigator from "./ProfileNavigator";
 import { useNavigation } from "@react-navigation/native";
-import { ProfileScreen } from "../screens";
 
 export type BottomTabParamList = {
   Map: undefined;
-  Profile: undefined;
+  Compte: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
@@ -25,7 +24,7 @@ const TabNavigator: React.FC = ({ navigation }: any) => {
             iconName = focused ? "map" : "map-outline";
             // } else if (route.name === "Feed") {
             //   iconName = focused ? "image" : "image-outline";
-          } else if (route.name === "Profile") {
+          } else if (route.name === "Compte") {
             iconName = focused ? "person" : "person-outline";
           }
           return <Ionicons name={iconName} size={size} color={color} />;
@@ -40,7 +39,7 @@ const TabNavigator: React.FC = ({ navigation }: any) => {
         options={{ unmountOnBlur: true }}
       />
       <Tab.Screen
-        name="Profile"
+        name="Compte"
         component={ProfileNavigator}
         options={{
           headerShown: false,

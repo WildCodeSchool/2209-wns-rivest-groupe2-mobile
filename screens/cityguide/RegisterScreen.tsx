@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useLayoutEffect } from "react";
 import * as yup from "yup";
 import { gql, useMutation } from "@apollo/client";
 import {
@@ -49,6 +49,14 @@ async function saveTokenInSecureStore(key: string, value: string) {
 }
 
 const RegisterScreen: React.FC = ({ navigation }: any) => {
+  
+  // DISABLE TOP NAVIGATION
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, []);
+
   // VALIDATION SCHEMA
   const validationSchema = yup
     .object({
@@ -80,7 +88,7 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
     onCompleted(data) {
       saveTokenInSecureStore("token", data.createUser.token);
       setUser(data.createUser);
-      navigation.navigate(ROUTES.PROFILE)
+      navigation.navigate(ROUTES.MYPROFILE);
       //navigation.navigate("Profile");
     },
     onError(error: any) {

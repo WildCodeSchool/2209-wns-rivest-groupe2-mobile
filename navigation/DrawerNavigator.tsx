@@ -1,9 +1,8 @@
 import { View, Text, TouchableOpacity } from "react-native";
-import React from "react";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { Ionicons } from "@expo/vector-icons";
 import { ROUTES } from "../constants";
-import { RegisterScreen, MapScreen, ProfileScreen } from "../screens/index";
+import { RegisterScreen, MapScreen, MyProfileScreen } from "../screens/index";
 
 const Drawer = createDrawerNavigator();
 
@@ -21,8 +20,8 @@ function DrawerNavigator() {
       }}
     >
       <Drawer.Screen
-        name={ROUTES.PROFILE}
-        component={ProfileScreen}
+        name={ROUTES.MYPROFILE}
+        component={MyProfileScreen}
         options={{
           title: "Home",
           drawerIcon: ({ focused, color, size }) => (
@@ -44,7 +43,7 @@ function DrawerNavigator() {
 
       <Drawer.Screen
         name={ROUTES.MAP}
-        component={ProfileScreen}
+        component={MyProfileScreen}
         options={{
           title: "Notifications",
           drawerIcon: ({ focused, color, size }) => (

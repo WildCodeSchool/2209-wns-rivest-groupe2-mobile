@@ -7,7 +7,6 @@ import {
 import Constants from "expo-constants";
 import Navigator from "./navigation/Navigator";
 import { RecoilRoot } from "recoil";
-import React from "react";
 import { Provider as PaperProvider } from 'react-native-paper';
 
 export default function App() {
@@ -15,7 +14,7 @@ export default function App() {
 
   const uri =
     manifest?.debuggerHost &&
-    `http://${manifest.debuggerHost.split(":").shift()}:5001`;
+    `http://${manifest.debuggerHost.split(":").shift()}:5000`;
   const httpLink = createHttpLink({
     uri: uri,
   });
