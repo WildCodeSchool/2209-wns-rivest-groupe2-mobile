@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface InputGroupProps {
   label?: string;
@@ -49,8 +50,7 @@ export default InputGroup;
 
 const styles = StyleSheet.create({
   main: {
-    // paddingTop: "0.5rem",
-    // paddingBottom: "0.5rem",
+    justifyContent: 'center',
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -62,9 +62,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   errorDetails: {
-    //marginTop: "0.25rem",
     color: "#EF4444",
-    //fontSize: "0.875rem",
-    //lineHeight: "1.25rem",
+    marginLeft: 25,
+    marginRight: 25,
+    padding: 5,
   },
 });

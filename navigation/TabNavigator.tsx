@@ -1,48 +1,72 @@
 import React from "react";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import MapScreen from "../screens/cityguide/MapScreen";
-import ProfileScreen from "../screens/cityguide/ProfileScreen";
+import ProfileNavigator from "./ProfileNavigator";
+import { useNavigation } from "@react-navigation/native";
+import DrawerNavigator from "./DrawerNavigator";
+import DiscoverScreen from "../screens/cityguide/DiscoverScreen";
 
 export type BottomTabParamList = {
   Map: undefined;
-  Profile: {
-    id: string;
-    title: string;
-    description: string;
-    image: string;
-  };
+  Compte: undefined;
 };
 
 const Tab = createBottomTabNavigator<BottomTabParamList>();
 
-const TabNavigator: React.FC = () => {
+const TabNavigator: React.FC = ({ navigation }: any) => {
   return (
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            let iconName: keyof typeof Ionicons.glyphMap | undefined;
-            if (route.name === "Map") {
-              iconName = focused ? "map" : "map-outline";
-            // } else if (route.name === "Feed") {
-            //   iconName = focused ? "image" : "image-outline";
-            } else if (route.name === "Profile") {
-              iconName = focused ? "person" : "person-outline";
-            }
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: "blue",
-          tabBarInactiveTintColor: "gray",
-        })}
-      >
-        <Tab.Screen name="Map" component={MapScreen} options={{ unmountOnBlur: true }} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-      </Tab.Navigator>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: keyof typeof Ionicons.glyphMap | undefined;
+          if (route.name === "Map") {
+            iconName = focused ? "map" : "map-outline";
+          } else if (route.name === "Découvrir") {
+            iconName = focused ? "image" : "image-outline";
+          } else if (route.name === "Compte") {
+            iconName = focused ? "person" : "person-outline";
+          }
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: "#44bdbe",
+        tabBarInactiveTintColor: "gray",
+      })}
+    >
+      <Tab.Screen
+        name="Map"
+        component={MapScreen}
+        options={{ unmountOnBlur: true }}
+      />
+      <Tab.Screen
+        name="Découvrir"
+        component={DiscoverScreen}
+        options={{ unmountOnBlur: true }}
+      />
+      <Tab.Screen
+        name="Compte"
+        component={ProfileNavigator}
+        // options={{
+        //   headerShown: true,
+        //   headerRight: () => {
+        //     return (
+        //       <TouchableOpacity onPress={() => navigation.openDrawer()}>
+        //         <Ionicons
+        //           name="md-menu"
+        //           size={30}
+        //           color="#44bdbe"
+        //           style={{ marginRight: 10 }}
+        //         />
+        //       </TouchableOpacity>
+        //     );
+        //   },
+        // }}
+      />
+    </Tab.Navigator>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -53,4 +77,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default TabNavigator
+export default TabNavigator;

@@ -7,6 +7,10 @@ import {
 import Constants from "expo-constants";
 import Navigator from "./navigation/Navigator";
 import { RecoilRoot } from "recoil";
+import { Provider as PaperProvider } from "react-native-paper";
+import { WINDOWS } from "nativewind/dist/utils/selector";
+import { withExpoSnack } from "nativewind";
+import { RootSiblingParent } from "react-native-root-siblings";
 
 export default function App() {
   const { manifest } = Constants;
@@ -14,6 +18,7 @@ export default function App() {
   const uri =
     manifest?.debuggerHost &&
     `http://${manifest.debuggerHost.split(":").shift()}:5000`;
+
   const httpLink = createHttpLink({
     uri: uri,
   });
@@ -25,9 +30,13 @@ export default function App() {
 
   return (
     <ApolloProvider client={client}>
-      <RecoilRoot>
-        <Navigator />
-      </RecoilRoot>
+      <RootSiblingParent>
+        <RecoilRoot>
+          <PaperProvider>
+            <Navigator />
+          </PaperProvider>
+        </RecoilRoot>
+      </RootSiblingParent>
     </ApolloProvider>
   );
 }
