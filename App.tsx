@@ -1,30 +1,14 @@
-import {
-  ApolloClient,
-  InMemoryCache,
-  ApolloProvider,
-  createHttpLink,
-} from "@apollo/client";
-import Constants from "expo-constants";
+import { ApolloClient, InMemoryCache, ApolloProvider } from "@apollo/client";
 import Navigator from "./navigation/Navigator";
 import { RecoilRoot } from "recoil";
 import { Provider as PaperProvider } from "react-native-paper";
-import { WINDOWS } from "nativewind/dist/utils/selector";
-import { withExpoSnack } from "nativewind";
 import { RootSiblingParent } from "react-native-root-siblings";
 
 export default function App() {
-  const { manifest } = Constants;
-
-  const uri =
-    manifest?.debuggerHost &&
-    `http://${manifest.debuggerHost.split(":").shift()}:5000`;
-
-  const httpLink = createHttpLink({
-    uri: uri,
-  });
+  const postUrl = process.env.BASE_URL;
 
   const client = new ApolloClient({
-    link: httpLink,
+    uri: "https://rivest2.wns.wilders.dev/graphql",
     cache: new InMemoryCache(),
   });
 

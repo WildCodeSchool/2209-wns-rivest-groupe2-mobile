@@ -8,33 +8,18 @@ import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
 import { useRecoilState, useResetRecoilState } from "recoil";
 import { userState } from "../../atom/userAtom";
-import { NavigationContainer, DrawerActions } from '@react-navigation/native';
+import { NavigationContainer, DrawerActions } from "@react-navigation/native";
 
-const MyProfileScreen: React.FC = ({ navigation }:any) => {
-
+const MyProfileScreen: React.FC = ({ navigation }: any) => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [user, setUser] = useRecoilState(userState);
   const resetUserState = useResetRecoilState(userState);
 
-  const [userTest, setUserTest] = React.useState({
-    firstName: "Redneck",
-    lastName: "FromCaroline",
-    email: "redneck@gmail.com",
-    phoneNumber: "003442974824",
-  });
-
-  const updatedUser = (values) => {
-    setUserTest({
-      firstName: values.firstName,
-      lastName: values.lastName,
-      email: values.email,
-      phoneNumber: values.phoneNumber,
-    });
-  };
+  console.log("user", user);
 
   // LOGOUT
   const logout = async () => {
-    const deleteToken = await SecureStore.deleteItemAsync("token");
+    await SecureStore.deleteItemAsync("token");
     resetUserState();
     navigation.navigate("Map");
   };
@@ -51,17 +36,19 @@ const MyProfileScreen: React.FC = ({ navigation }:any) => {
       <View className="flex-row items-center justify-between my-5 px-5">
         <View>
           <Text className="text-[30px] text-[#0B646B] font-semibold">
-            Hello {userTest.firstName}
+            Bonjour {user?.userFromDB.firstname}
           </Text>
-          <Text className="text-[15px] text-[#527873]">Que va t'on découvrir aujourd'hui ?</Text>
+          <Text className="text-[15px] text-[#527873]">
+            Que va t'on découvrir aujourd'hui ?
+          </Text>
         </View>
-        <Ionicons
+        {/* <Ionicons
           name="md-menu"
           size={30}
           color="#44bdbe"
           style={{ marginRight: 10 }}
           onPress={() => navigation.openDrawer()}
-        />
+        /> */}
       </View>
 
       <View>
@@ -96,16 +83,13 @@ const MyProfileScreen: React.FC = ({ navigation }:any) => {
           />
           <Card.Content>
             <Text>
-              <Text>User first name:</Text> {userTest.firstName}
+              <Text>User first name:</Text> {user?.userFromDB.firstname}
             </Text>
             <Text>
-              <Text>User last name:</Text> {userTest.lastName}
+              <Text>User last name:</Text> {user?.userFromDB.lastname}
             </Text>
             <Text>
-              <Text>User email:</Text> {userTest.email}
-            </Text>
-            <Text>
-              <Text>User phone number:</Text> {userTest.phoneNumber}
+              <Text>User email:</Text> {user?.userFromDB.email}
             </Text>
             <Text>
               <Text>Interests:</Text> #keywords #keywords #keywords #keywords

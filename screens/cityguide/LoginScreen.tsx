@@ -7,7 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
 } from "react-native";
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import { gql, useLazyQuery } from "@apollo/client";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import InputGroup from "../../components/InputGroup";
@@ -15,11 +15,12 @@ import Button from "../../components/Button";
 import { Link } from "@react-navigation/native";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { IUser } from "../../types/IUser";
+import { IUser, IUserForm } from "../../types/IUser";
 import { useRecoilState } from "recoil";
 import { userState } from "../../atom/userAtom";
 import * as SecureStore from "expo-secure-store";
 import { ROUTES } from "../../constants";
+import Ionicons from "@expo/vector-icons/Ionicons";
 
 export const GET_TOKEN = gql`
   query Query($password: String!, $email: String!) {
@@ -43,6 +44,12 @@ async function saveTokenInSecureStore(key: string, value: string) {
 }
 
 const LoginScreen = ({ navigation }) => {
+  const [passwordShown, setPasswordShown] = useState(false);
+
+  const handleShowPassword = () => {
+    setPasswordShown(!passwordShown);
+  };
+
   //DISABLE TOP NAVIGATION
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -82,7 +89,7 @@ const LoginScreen = ({ navigation }) => {
     },
   });
 
-  const onSubmit: SubmitHandler<IUser> = async (fields: {
+  const onSubmit: SubmitHandler<IUserForm> = async (fields: {
     email: string;
     password: string;
   }) => {
@@ -99,7 +106,7 @@ const LoginScreen = ({ navigation }) => {
     handleSubmit,
     clearErrors,
     formState: { errors },
-  } = useForm<IUser>({
+  } = useForm<IUserForm>({
     mode: "onBlur",
     resolver: yupResolver(validationSchema),
   });
@@ -146,15 +153,27 @@ const LoginScreen = ({ navigation }) => {
                     field: { onChange, onBlur, value },
                     fieldState: { error },
                   }) => (
-                    <InputGroup
-                      onBlur={onBlur}
-                      onChangeText={onChange}
-                      value={value}
-                      placeholder="Mot de passe"
-                      error={!!error}
-                      errorDetails={error?.message}
-                      //password
-                    />
+                    <View>
+                      <InputGroup
+                        onBlur={onBlur}
+                        onChangeText={onChange}
+                        value={value}
+                        placeholder="Mot de passe"
+                        error={!!error}
+                        errorDetails={error?.message}
+                        password={passwordShown ? false : true}
+                      />
+                      <TouchableOpacity
+                        onPress={handleShowPassword}
+                        className="absolute top-7 right-10"
+                      >
+                        {passwordShown ? (
+                          <Ionicons name="eye" color="black" size={20} />
+                        ) : (
+                          <Ionicons name="eye-off" color="black" size={20} />
+                        )}
+                      </TouchableOpacity>
+                    </View>
                   )}
                 />
                 <View>
