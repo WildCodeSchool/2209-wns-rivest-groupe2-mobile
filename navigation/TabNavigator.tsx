@@ -6,6 +6,8 @@ import { Ionicons } from "@expo/vector-icons";
 import MapScreen from "../screens/cityguide/MapScreen";
 import ProfileNavigator from "./ProfileNavigator";
 import { useNavigation } from "@react-navigation/native";
+import DrawerNavigator from "./DrawerNavigator";
+import DiscoverScreen from "../screens/cityguide/DiscoverScreen";
 
 export type BottomTabParamList = {
   Map: undefined;
@@ -22,14 +24,14 @@ const TabNavigator: React.FC = ({ navigation }: any) => {
           let iconName: keyof typeof Ionicons.glyphMap | undefined;
           if (route.name === "Map") {
             iconName = focused ? "map" : "map-outline";
-            // } else if (route.name === "Feed") {
-            //   iconName = focused ? "image" : "image-outline";
+          } else if (route.name === "Découvrir") {
+            iconName = focused ? "image" : "image-outline";
           } else if (route.name === "Compte") {
             iconName = focused ? "person" : "person-outline";
           }
           return <Ionicons name={iconName} size={size} color={color} />;
         },
-        tabBarActiveTintColor: "blue",
+        tabBarActiveTintColor: "#44bdbe",
         tabBarInactiveTintColor: "gray",
       })}
     >
@@ -39,23 +41,28 @@ const TabNavigator: React.FC = ({ navigation }: any) => {
         options={{ unmountOnBlur: true }}
       />
       <Tab.Screen
+        name="Découvrir"
+        component={DiscoverScreen}
+        options={{ unmountOnBlur: true }}
+      />
+      <Tab.Screen
         name="Compte"
         component={ProfileNavigator}
-        options={{
-          headerShown: false,
-          // headerRight: ({navigation}:any) => {
-          //   return (
-          //     <TouchableOpacity onPress={() => navigation.openDrawer()}>
-          //       <Ionicons
-          //         name="md-menu"
-          //         size={30}
-          //         color="#0fa6a6"
-          //         style={{ marginRight: 10 }}
-          //       />
-          //     </TouchableOpacity>
-          //   );
-          // },
-        }}
+        // options={{
+        //   headerShown: true,
+        //   headerRight: () => {
+        //     return (
+        //       <TouchableOpacity onPress={() => navigation.openDrawer()}>
+        //         <Ionicons
+        //           name="md-menu"
+        //           size={30}
+        //           color="#44bdbe"
+        //           style={{ marginRight: 10 }}
+        //         />
+        //       </TouchableOpacity>
+        //     );
+        //   },
+        // }}
       />
     </Tab.Navigator>
   );

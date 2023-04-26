@@ -16,8 +16,6 @@ function AvatarImagePicker(){
           quality: 1,
         });
     
-        console.log(result);
-    
         if (!result.canceled) {
           setImage(result.assets[0].uri);
           setModalOpen(false)
@@ -32,15 +30,12 @@ function AvatarImagePicker(){
           quality: 1,
         });
     
-        console.log(result);
-    
         if (!result.canceled) {
           setImage(result.assets[0].uri);
           setModalOpen(false)
         }
       };
 
-      
       return <View>
       <TouchableOpacity onPress={() => setModalOpen(true)} >
       <Avatar.Image size={100} source={{ uri: image }} />

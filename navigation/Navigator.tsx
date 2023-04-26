@@ -6,6 +6,9 @@ import CityGuideScreen from '../screens/cityguide/CityGuideScreen';
 import ProfileScreen from '../screens/cityguide/MyProfileScreen';
 import ProfileNavigator from './ProfileNavigator';
 import RegisterScreen from '../screens/cityguide/RegisterScreen';
+import { ROUTES } from '../constants';
+import DrawerNavigator from './DrawerNavigator';
+import ItemScreen from '../screens/cityguide/ItemScreen';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +19,8 @@ const Navigator = () => {
         <Stack.Screen name="Splash" component={Splash} />
         <Stack.Screen name="CityGuideScreen" component={CityGuideScreen} />
         <Stack.Screen name="ProfileNavigator" component={ProfileNavigator} />
+        <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
+        <Stack.Screen name="ItemScreen" component={ItemScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )

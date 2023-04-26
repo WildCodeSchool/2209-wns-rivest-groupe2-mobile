@@ -8,25 +8,20 @@ import * as SecureStore from "expo-secure-store";
 import { useNavigation } from "@react-navigation/native";
 import { useRecoilState, useResetRecoilState } from "recoil";
 import { userState } from "../../atom/userAtom";
+import { NavigationContainer, DrawerActions } from '@react-navigation/native';
 
-const MyProfileScreen: React.FC = ({ navigation }: any) => {
+const MyProfileScreen: React.FC = ({ navigation }:any) => {
+
   const [modalOpen, setModalOpen] = React.useState(false);
   const [user, setUser] = useRecoilState(userState);
   const resetUserState = useResetRecoilState(userState);
 
   const [userTest, setUserTest] = React.useState({
-    firstName: "New",
-    lastName: "NewLast",
-    email: "qkfjkbgz@gmail.com",
+    firstName: "Redneck",
+    lastName: "FromCaroline",
+    email: "redneck@gmail.com",
     phoneNumber: "003442974824",
   });
-
-  // DISABLE TOP NAVIGATION
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerShown: false,
-    });
-  }, []);
 
   const updatedUser = (values) => {
     setUserTest({
@@ -44,8 +39,31 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
     navigation.navigate("Map");
   };
 
+  // DISABLE TOP NAVIGATION
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: false,
+    });
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
+      <View className="flex-row items-center justify-between my-5 px-5">
+        <View>
+          <Text className="text-[30px] text-[#0B646B] font-semibold">
+            Hello {userTest.firstName}
+          </Text>
+          <Text className="text-[15px] text-[#527873]">Que va t'on découvrir aujourd'hui ?</Text>
+        </View>
+        <Ionicons
+          name="md-menu"
+          size={30}
+          color="#44bdbe"
+          style={{ marginRight: 10 }}
+          onPress={() => navigation.openDrawer()}
+        />
+      </View>
+
       <View>
         <View>
           <AvatarImagePicker />
@@ -104,7 +122,6 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
               style={{ ...styles.modalToggle, ...styles.modalClose }}
               onPress={() => setModalOpen(false)}
             />
-            {/* <EditProfile user={user} updatedUser={updatedUser} /> */}
           </View>
         </Modal>
         <Button onPress={logout} title={"Se déconnecter"} />

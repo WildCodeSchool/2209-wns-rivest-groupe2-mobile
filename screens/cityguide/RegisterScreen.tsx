@@ -22,8 +22,6 @@ import { IUser } from "../../types/IUser";
 import { Link } from "@react-navigation/native";
 import { ROUTES } from "../../constants";
 
-//interface CreateAccountProps {}
-
 // MUTATION APOLLO
 const CREATE_USER = gql`
   mutation Mutation($email: String!, $password: String!) {

@@ -41,7 +41,6 @@ const InputGroup: React.FunctionComponent<InputGroupProps> = ({
         secureTextEntry={password}
         keyboardType={type}
       />
-      {/* <Ionicons name="map" color="#000" size={14} style={styles.icon}/> */}
       {!!errorDetails && <Text style={styles.errorDetails}>{errorDetails}</Text>}
     </View>
   );
@@ -62,11 +61,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
   },
-  // icon: {
-  //   position: 'absolute',
-  //   right: 40,
-  //   height: 35,
-  // },
   errorDetails: {
     color: "#EF4444",
     marginLeft: 25,

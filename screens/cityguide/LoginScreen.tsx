@@ -43,7 +43,7 @@ async function saveTokenInSecureStore(key: string, value: string) {
 }
 
 const LoginScreen = ({ navigation }) => {
-  // DISABLE TOP NAVIGATION
+  //DISABLE TOP NAVIGATION
   useLayoutEffect(() => {
     navigation.setOptions({
       headerShown: false,
@@ -69,12 +69,10 @@ const LoginScreen = ({ navigation }) => {
 
   // RECOIL
   const [user, setUser] = useRecoilState(userState);
-  //console.log("=======> USER(LOGINSCREEN): ", user)
 
   // MUTATION - SUBMISSION
   const [signIn] = useLazyQuery(GET_TOKEN, {
     onCompleted(data) {
-      console.log("==========> data", data);
       saveTokenInSecureStore("token", data.getToken.token);
       setUser(data.getToken);
       navigation.navigate("Profile");
