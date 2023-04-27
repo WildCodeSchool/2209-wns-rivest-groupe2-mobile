@@ -8,10 +8,17 @@ interface ItemCardContainerProps {
   name: string;
   pictureUrl: string;
   address: string;
+  postal: number;
 }
 
-const ItemCardContainer: React.FC<ItemCardContainerProps> = ({ id, name, pictureUrl, address }) => {
-  const navigation = useNavigation()
+const ItemCardContainer: React.FC<ItemCardContainerProps> = ({
+  id,
+  name,
+  pictureUrl,
+  address,
+  postal,
+}) => {
+  const navigation = useNavigation();
 
   return (
     <TouchableOpacity
@@ -27,9 +34,9 @@ const ItemCardContainer: React.FC<ItemCardContainerProps> = ({ id, name, picture
       </Text>
       <View className="flex-row items-center space-x-1 flex-wrap">
         <Ionicons name="pin" size={18} color="#44bdbe" />
-          <Text className="text-[#428288] text-[10px] font-bold">
-            {address?.length > 18 ? `${address.slice(0, 18)}..` : address}
-          </Text>
+        <Text className="text-[#428288] text-[10px] font-bold">
+          {address?.length > 18 ? `${address.slice(0, 18)}..` : address}
+        </Text>
       </View>
     </TouchableOpacity>
   );

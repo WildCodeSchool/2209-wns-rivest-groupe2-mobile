@@ -12,14 +12,12 @@ import {
 } from "react-native";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import Logo from "../../assets/images/city-guide-logo.svg";
 import Button from "../../components/Button";
 import InputGroup from "../../components/InputGroup";
 import * as SecureStore from "expo-secure-store";
 import { useRecoilState } from "recoil";
 import { userState } from "../../atom/userAtom";
-import { IUser, IUserForm } from "../../types/IUser";
-import { Link } from "@react-navigation/native";
+import { IUserForm } from "../../types/IUser";
 import { ROUTES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
 

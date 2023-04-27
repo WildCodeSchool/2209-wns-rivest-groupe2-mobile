@@ -12,15 +12,14 @@ import { gql, useLazyQuery } from "@apollo/client";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import InputGroup from "../../components/InputGroup";
 import Button from "../../components/Button";
-import { Link } from "@react-navigation/native";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { IUser, IUserForm } from "../../types/IUser";
+import { IUserForm } from "../../types/IUser";
 import { useRecoilState } from "recoil";
 import { userState } from "../../atom/userAtom";
 import * as SecureStore from "expo-secure-store";
 import { ROUTES } from "../../constants";
-import Ionicons from "@expo/vector-icons/Ionicons";
+import { Ionicons } from "@expo/vector-icons";
 
 export const GET_TOKEN = gql`
   query Query($password: String!, $email: String!) {
@@ -39,7 +38,7 @@ export const GET_TOKEN = gql`
   }
 `;
 
-async function saveTokenInSecureStore(key: string, value: string) {
+export async function saveTokenInSecureStore(key: string, value: string) {
   await SecureStore.setItemAsync(key, value);
 }
 
@@ -49,7 +48,6 @@ const LoginScreen = ({ navigation }) => {
   const handleShowPassword = () => {
     setPasswordShown(!passwordShown);
   };
-
   //DISABLE TOP NAVIGATION
   useLayoutEffect(() => {
     navigation.setOptions({

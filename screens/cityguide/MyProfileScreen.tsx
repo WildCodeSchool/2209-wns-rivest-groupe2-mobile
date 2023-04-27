@@ -1,21 +1,51 @@
-import { Stack, TextInput, Button } from "@react-native-material/core";
-import React, { useLayoutEffect } from "react";
-import { Image, SafeAreaView, View, StyleSheet } from "react-native";
-import { Avatar, Card, Text, IconButton, Modal } from "react-native-paper";
+import { Button } from "@react-native-material/core";
+import React, { useCallback, useLayoutEffect, useState } from "react";
+import { SafeAreaView, View, StyleSheet } from "react-native";
+import { Text, Modal } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import AvatarImagePicker from "../../components/AvatarImagePicker";
 import * as SecureStore from "expo-secure-store";
-import { useNavigation } from "@react-navigation/native";
 import { useRecoilState, useResetRecoilState } from "recoil";
 import { userState } from "../../atom/userAtom";
-import { NavigationContainer, DrawerActions } from "@react-navigation/native";
+import { GET_POI_QUERY } from "../../services/queries/Poi";
+import { useLazyQuery, useMutation } from "@apollo/client";
+import { useFocusEffect } from "@react-navigation/native";
+import ItemCardContainer from "../../components/ItemCardContainer";
+import { ScrollView } from "react-native-gesture-handler";
+import { UPDATE_USER_MUTATION } from "../../services/mutations/User";
+import { saveTokenInSecureStore } from "./LoginScreen";
+import { Controller, useForm } from "react-hook-form";
+import InputGroup from "../../components/InputGroup";
 
 const MyProfileScreen: React.FC = ({ navigation }: any) => {
-  const [modalOpen, setModalOpen] = React.useState(false);
+  const [visible, setVisible] = React.useState(false);
+
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
+  const containerStyle = { backgroundColor: "white", padding: 20 };
   const [user, setUser] = useRecoilState(userState);
   const resetUserState = useResetRecoilState(userState);
 
-  console.log("user", user);
+  const [getAllPois, { loading, error }] = useLazyQuery(GET_POI_QUERY);
+  const [pois, setPois] = useState([]);
+
+  async function fetchPois() {
+    try {
+      const data = await getAllPois();
+      const dataPois = [...data.data.getAllPoi];
+
+      setPois(dataPois);
+    } catch (error) {
+      console.log(error);
+      setPois([]);
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchPois();
+    }, [])
+  );
 
   // LOGOUT
   const logout = async () => {
@@ -31,10 +61,62 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
     });
   }, []);
 
+  const [updateUser] = useMutation(UPDATE_USER_MUTATION, {
+    variables: { data: {} },
+    onCompleted: (data) => {
+      console.log("data.updateUser", data.updateUser);
+      saveTokenInSecureStore("token", data.getToken.token);
+      setUser(data.updateUser);
+    },
+  });
+
+  const onSubmit = (formData: {}) => {
+    updateUser({
+      variables: { data: { ...formData, id: user.userFromDB.id } },
+    });
+  };
+
+  const {
+    control,
+    handleSubmit,
+    clearErrors,
+    formState: { errors },
+  } = useForm({
+    mode: "onBlur",
+    /* resolver: yupResolver(validationSchema), */
+  });
+
   return (
     <SafeAreaView style={styles.container}>
-      <View className="flex-row items-center justify-between my-5 px-5">
-        <View>
+      <View className="flex items-end px-10">
+        <Text className="underline font-bold" onPress={showModal}>
+          Modifier mes informations
+        </Text>
+      </View>
+      <View className="flex-row items-center justify-between mx-auto my-5 px-5 py-5 bg-white w-[85%] border rounded-xl border-slate-100 shadow-lg shadow-black">
+        <View className="flex items-center">
+          <AvatarImagePicker />
+          <Text className="pt-5 text-xl font-bold">
+            {user?.userFromDB.firstname || user?.userFromDB.email}
+          </Text>
+          <Text className="text-sm">
+            {user?.userFromDB.type === "freeUser"
+              ? "Free user"
+              : user?.userFromDB.type === "admin"
+              ? "admin"
+              : user?.userFromDB.type === "paidUser"
+              ? "Paid User"
+              : ""}
+          </Text>
+        </View>
+        <View className="flex-row items-center">
+          <Text className="text-2xl px-3">5</Text>
+          <Ionicons name="heart" color="black" size={30} />
+        </View>
+      </View>
+
+      <View style={styles.subContainer}>
+        <View className="p-5">
           <Text className="text-[30px] text-[#0B646B] font-semibold">
             Bonjour {user?.userFromDB.firstname}
           </Text>
@@ -42,74 +124,80 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
             Que va t'on découvrir aujourd'hui ?
           </Text>
         </View>
-        {/* <Ionicons
-          name="md-menu"
-          size={30}
-          color="#44bdbe"
-          style={{ marginRight: 10 }}
-          onPress={() => navigation.openDrawer()}
-        /> */}
-      </View>
-
-      <View>
-        <View>
-          <AvatarImagePicker />
-
-          <View>
-            <View>
-              <Ionicons name="medal-outline" size={20} />
-              <Text> User type</Text>
-            </View>
-            <View>
-              <Ionicons name="star-outline" size={20} />
-              <Text> User rating</Text>
-            </View>
+        <ScrollView>
+          <View className="px-4 flex-row items-center justify-evenly flex-wrap mt-4">
+            {pois?.length > 0 ? (
+              pois?.map((poi, i) => (
+                <ItemCardContainer
+                  key={i}
+                  id={poi.id}
+                  pictureUrl={
+                    poi?.pictureUrl
+                      ? poi?.pictureUrl
+                      : "https://cdn.pixabay.com/photo/2015/10/30/12/22/eat-1014025_1280.jpg"
+                  }
+                  name={poi.name}
+                  address={poi.address}
+                  postal={poi.postal}
+                />
+              ))
+            ) : (
+              <>
+                <View className="w-full h-[400px] bg-gray-200 placeholder:items-center space-y-8 justify-center">
+                  <Text className="text-2xl text-[#428288] font-semibold">
+                    Ooops... No Data Found
+                  </Text>
+                </View>
+              </>
+            )}
           </View>
-        </View>
-
-        <Card>
-          <Card.Title
-            title="User Info"
-            subtitle="User description"
-            titleVariant="titleMedium"
-            right={(props) => (
-              <IconButton
-                {...props}
-                icon="pencil"
-                size={20}
-                onPress={() => setModalOpen(true)}
+          <Button onPress={logout} title={"Se déconnecter"} />
+        </ScrollView>
+      </View>
+      <Modal
+        visible={visible}
+        onDismiss={hideModal}
+        contentContainerStyle={containerStyle}
+      >
+        <View>
+          <Controller
+            control={control}
+            name="email"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <InputGroup
+                onBlur={onBlur}
+                onChangeText={onChange}
+                value={value}
+                placeholder="Email"
+                error={!!error}
+                errorDetails={error?.message}
               />
             )}
           />
-          <Card.Content>
-            <Text>
-              <Text>User first name:</Text> {user?.userFromDB.firstname}
-            </Text>
-            <Text>
-              <Text>User last name:</Text> {user?.userFromDB.lastname}
-            </Text>
-            <Text>
-              <Text>User email:</Text> {user?.userFromDB.email}
-            </Text>
-            <Text>
-              <Text>Interests:</Text> #keywords #keywords #keywords #keywords
-              #keywords #keywords
-            </Text>
-          </Card.Content>
-        </Card>
-
-        <Modal visible={modalOpen}>
-          <View style={styles.modalContent}>
-            <Ionicons
-              name="close"
-              size={24}
-              style={{ ...styles.modalToggle, ...styles.modalClose }}
-              onPress={() => setModalOpen(false)}
-            />
-          </View>
-        </Modal>
-        <Button onPress={logout} title={"Se déconnecter"} />
-      </View>
+          <Controller
+            control={control}
+            name="password"
+            render={({
+              field: { onChange, onBlur, value },
+              fieldState: { error },
+            }) => (
+              <View>
+                <InputGroup
+                  onBlur={onBlur}
+                  onChangeText={onChange}
+                  value={value}
+                  placeholder="Mot de passe"
+                  error={!!error}
+                  errorDetails={error?.message}
+                />
+              </View>
+            )}
+          />
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -117,9 +205,10 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "white",
   },
-  loginForm: {
-    flex: 1,
+  subContainer: {
+    flex: 2,
   },
   modalContent: {
     flex: 1,
@@ -129,15 +218,6 @@ const styles = StyleSheet.create({
   },
   modalClose: {
     flex: 1,
-  },
-  title: {
-    fontWeight: "bold",
-    textAlign: "center",
-    fontSize: 30,
-    paddingBottom: 15,
-  },
-  whiteContrast: {
-    color: "#fff",
   },
 });
 
