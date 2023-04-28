@@ -1,41 +1,12 @@
-import {
-  View,
-  Text,
-  SafeAreaView,
-  TouchableOpacity,
-  ScrollView,
-} from "react-native";
+import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
-import { Ionicons } from "@expo/vector-icons";
 import MenuContainer from "../../components/MenuContainer";
+import { GET_POI_QUERY } from "../../services/queries/Poi";
 import { Hotels, Restaurants, Musee } from "../../assets/images";
-import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client";
 import { useFocusEffect } from "@react-navigation/native";
 import ItemCardContainer from "../../components/ItemCardContainer";
 import { IPOIData } from "../../types/IPoiData";
-
-export const GET_POI_QUERY = gql`
-  query GetAllPois {
-    getAllPoi {
-      id
-      name
-      address
-      postal
-      type
-      coordinates
-      creationDate
-      pictureUrl
-      websiteURL
-      description
-      priceRange
-      city
-      daysOpen
-      hoursOpen
-      hoursClose
-    }
-  }
-`;
 
 const DiscoverScreen = ({ navigation }) => {
 
@@ -118,8 +89,8 @@ const DiscoverScreen = ({ navigation }) => {
         <View className="px-4 flex-row items-center justify-evenly flex-wrap mt-4 mb-36">
           {pois?.length > 0 ? (
             <>
-              { isFiltered ?
-              pois?.filter((poi, i) => (poi.type == type))
+              {isFiltered ?
+              pois?.filter((poi: any, i) => (poi.type == type))
               .map((poi, i) => (
                 <ItemCardContainer
                   key={i}

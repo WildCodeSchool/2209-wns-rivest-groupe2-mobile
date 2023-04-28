@@ -1,4 +1,4 @@
-import React, { useLayoutEffect } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import * as yup from "yup";
 import { gql, useMutation } from "@apollo/client";
 import {
@@ -12,15 +12,14 @@ import {
 } from "react-native";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
-import Logo from "../../assets/images/city-guide-logo.svg";
 import Button from "../../components/Button";
 import InputGroup from "../../components/InputGroup";
 import * as SecureStore from "expo-secure-store";
 import { useRecoilState } from "recoil";
 import { userState } from "../../atom/userAtom";
-import { IUser } from "../../types/IUser";
-import { Link } from "@react-navigation/native";
+import { IUserForm } from "../../types/IUser";
 import { ROUTES } from "../../constants";
+import { Ionicons } from "@expo/vector-icons";
 
 // MUTATION APOLLO
 const CREATE_USER = gql`
@@ -47,7 +46,17 @@ async function saveTokenInSecureStore(key: string, value: string) {
 }
 
 const RegisterScreen: React.FC = ({ navigation }: any) => {
-  
+  const [passwordShown, setPasswordShown] = useState(false);
+  const [passwordShownBis, setPasswordShownBis] = useState(false);
+
+  const handleShowPassword = () => {
+    setPasswordShown(!passwordShown);
+  };
+
+  const handleShowPasswordBis = () => {
+    setPasswordShownBis(!passwordShownBis);
+  };
+
   // DISABLE TOP NAVIGATION
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -94,7 +103,7 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
     },
   });
 
-  const onSubmit: SubmitHandler<IUser> = async (fields: {
+  const onSubmit: SubmitHandler<IUserForm> = async (fields: {
     email: string;
     password: string;
   }) => {
@@ -111,7 +120,7 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
     handleSubmit,
     clearErrors,
     formState: { errors },
-  } = useForm<IUser>({
+  } = useForm<IUserForm>({
     mode: "onBlur",
     resolver: yupResolver(validationSchema),
   });
@@ -157,15 +166,27 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
                   field: { onChange, onBlur, value },
                   fieldState: { error },
                 }) => (
-                  <InputGroup
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder="Mot de passe"
-                    error={!!error}
-                    errorDetails={error?.message}
-                    //password
-                  />
+                  <View>
+                    <InputGroup
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Mot de passe"
+                      error={!!error}
+                      errorDetails={error?.message}
+                      password={passwordShown ? false : true}
+                    />
+                    <TouchableOpacity
+                      onPress={handleShowPassword}
+                      className="absolute top-7 right-10"
+                    >
+                      {passwordShown ? (
+                        <Ionicons name="eye" color="black" size={20} />
+                      ) : (
+                        <Ionicons name="eye-off" color="black" size={20} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
                 )}
               />
               <Controller
@@ -175,15 +196,27 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
                   field: { onChange, onBlur, value },
                   fieldState: { error },
                 }) => (
-                  <InputGroup
-                    onBlur={onBlur}
-                    onChangeText={onChange}
-                    value={value}
-                    placeholder="Confirmer le mot de passe"
-                    error={!!error}
-                    errorDetails={error?.message}
-                    //password
-                  />
+                  <View>
+                    <InputGroup
+                      onBlur={onBlur}
+                      onChangeText={onChange}
+                      value={value}
+                      placeholder="Confirmer le mot de passe"
+                      error={!!error}
+                      errorDetails={error?.message}
+                      password={passwordShownBis ? false : true}
+                    />
+                    <TouchableOpacity
+                      onPress={handleShowPasswordBis}
+                      className="absolute top-7 right-10"
+                    >
+                      {passwordShownBis ? (
+                        <Ionicons name="eye" color="black" size={20} />
+                      ) : (
+                        <Ionicons name="eye-off" color="black" size={20} />
+                      )}
+                    </TouchableOpacity>
+                  </View>
                 )}
               />
               <View>

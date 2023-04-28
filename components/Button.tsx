@@ -1,4 +1,4 @@
-import React, { Children } from "react";
+import React from "react";
 import { Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -8,7 +8,7 @@ interface ButtonProps {
   onPress: () => void;
 }
 
-const Button: React.FC<ButtonProps>= ({
+const Button: React.FC<ButtonProps> = ({
   type = "primary",
   children,
   onPress,
@@ -19,8 +19,8 @@ const Button: React.FC<ButtonProps>= ({
         <LinearGradient
           colors={["#34D399", "#3B82F6"]}
           style={styles.button}
-          start={{x:0, y:0}}
-          end={{x:1, y:1}}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
         >
           <Text style={styles.buttonInner}>{children}</Text>
         </LinearGradient>
@@ -48,6 +48,6 @@ const styles = StyleSheet.create({
     marginTop: "auto",
     fontSize: 17,
     fontWeight: "bold",
-    letterSpacing:3,
+    letterSpacing: 3,
   },
 });

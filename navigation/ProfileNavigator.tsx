@@ -1,9 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useState,
-} from "react";
+import React, { useCallback } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 import { RegisterScreen, LoginScreen, MyProfileScreen } from "../screens/index";
 import * as SecureStore from "expo-secure-store";
@@ -28,13 +23,6 @@ const ProfileNavigator: React.FC = ({ navigation }: any) => {
     }, [])
   );
 
-  // DISABLE TOP NAVIGATION
-  // useLayoutEffect(() => {
-  //   navigation.setOptions({
-  //     headerShown: false,
-  //   });
-  // }, []);
-
   return (
     <Stack.Navigator>
       {user !== null ? (
@@ -42,19 +30,19 @@ const ProfileNavigator: React.FC = ({ navigation }: any) => {
           <Stack.Screen
             name={ROUTES.MYPROFILE}
             component={MyProfileScreen}
-          //   options={{
-          //     headerShown: true,
-          //     headerLeft: () => (
-          //       <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
-          //         <Ionicons
-          //           name="md-menu"
-          //           size={30}
-          //           color="#44bdbe"
-          //           style={{ marginLeft: 10 }}
-          //         />
-          //       </TouchableOpacity>
-          //     ),
-          //   }}
+            //   options={{
+            //     headerShown: true,
+            //     headerLeft: () => (
+            //       <TouchableOpacity onPress={() => navigation.toggleDrawer()}>
+            //         <Ionicons
+            //           name="md-menu"
+            //           size={30}
+            //           color="#44bdbe"
+            //           style={{ marginLeft: 10 }}
+            //         />
+            //       </TouchableOpacity>
+            //     ),
+            //   }}
           />
           <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
         </>

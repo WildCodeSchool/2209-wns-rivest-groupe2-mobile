@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@apollo/client": "^3.7.9",
+    "@expo/vector-icons": "^13.0.0",
     "@hookform/resolvers": "^2.9.11",
     "@react-native-material/core": "^1.3.7",
     "@react-navigation/bottom-tabs": "^6.5.5",
@@ -19,8 +20,9 @@
     "react": "18.1.0",
     "react-dom": "18.1.0",
     "react-hook-form": "^7.43.2",
-    "react-native": "0.70.5",
+    "react-native": "0.70.8",
     "react-native-animatable": "^1.3.3",
+    "react-native-dotenv": "^3.4.8",
     "react-native-gesture-handler": "~2.8.0",
     "react-native-maps": "1.3.2",
     "react-native-paper": "^5.2.0",
@@ -33,6 +35,7 @@
     "react-native-web": "~0.18.7",
     "recoil": "^0.7.6",
     "yup": "^1.0.0",
+    "@shopify/flash-list": "1.3.1",
     "expo-location": "~15.0.1"
   },
   "devDependencies": {

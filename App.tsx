@@ -4,30 +4,45 @@ import {
   ApolloProvider,
   createHttpLink,
 } from "@apollo/client";
-import Constants from "expo-constants";
+import { setContext } from "@apollo/client/link/context";
 import Navigator from "./navigation/Navigator";
 import { RecoilRoot } from "recoil";
 import { Provider as PaperProvider } from "react-native-paper";
-import { WINDOWS } from "nativewind/dist/utils/selector";
-import { withExpoSnack } from "nativewind";
 import { RootSiblingParent } from "react-native-root-siblings";
+import * as SecureStore from "expo-secure-store";
+import { BASE_URL_API } from "@env";
+
+async function getValueFor(key: string): Promise<string | null> {
+  let result = await SecureStore.getItemAsync(key);
+  if (result) {
+    return result;
+  } else {
+    return null;
+  }
+}
 
 export default function App() {
-  const { manifest } = Constants;
+  const uri = BASE_URL_API;
+  const httpLink = createHttpLink({ uri: uri });
 
-  const uri =
-    manifest?.debuggerHost &&
-    `http://${manifest.debuggerHost.split(":").shift()}:5000`;
-
-  const httpLink = createHttpLink({
-    uri: uri,
+  const authLink = setContext(async (_, { headers }) => {
+    const token = await getValueFor("token");
+    return {
+      headers: {
+        ...headers,
+        authorization: token !== null ? `${token}` : "",
+      },
+    };
   });
+
+  /*   const resetClient = async () => {
+    await client.clearStore();
+  }; */
 
   const client = new ApolloClient({
-    link: httpLink,
+    uri: BASE_URL_API,
     cache: new InMemoryCache(),
   });
-
   return (
     <ApolloProvider client={client}>
       <RootSiblingParent>
