@@ -1,9 +1,23 @@
 import { View, Text, TouchableOpacity, Image } from "react-native";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
-const MenuContainer = ({ title, imageSrc, type, setType }) => {
+interface MenuContainerProps {
+  title: string;
+  imageSrc: string;
+  type: string;
+  setType: Dispatch<SetStateAction<string>>;
+  setIsFiltered: Dispatch<SetStateAction<boolean>>;
+  isFiltered: boolean;
+}
+
+const MenuContainer: React.FC<MenuContainerProps> = ({ title, imageSrc, type, setType, setIsFiltered, isFiltered }) => {
   const handlePress = () => {
-    setType(title.toLowerCase());
+    if (type === title.toLowerCase()) {
+      setIsFiltered(!isFiltered);
+    } else {
+      setType(title.toLowerCase());
+      setIsFiltered(true);
+    }
   };
 
   return (
@@ -13,10 +27,10 @@ const MenuContainer = ({ title, imageSrc, type, setType }) => {
     >
       <View
         className={`w-20 h-20 p-2 shadow-sm rounded-full items-center justify-center ${
-          type === title.toLowerCase() ? "bg-gray-200" : ""
+          type === title.toLowerCase() && isFiltered === true ? "bg-gray-200" : ""
         }`}
       >
-        <Image source={imageSrc} className="w-full h-full object-contain" />
+        <Image source={ imageSrc } className="w-full h-full object-contain" />
       </View>
       <Text className="text-[#00BBC9] font-semibold">{title}</Text>
     </TouchableOpacity>
