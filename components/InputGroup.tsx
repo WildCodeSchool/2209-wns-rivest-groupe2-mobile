@@ -18,6 +18,7 @@ interface InputGroupProps {
   onBlur?: () => void;
   error?: boolean;
   errorDetails?: string;
+  className?: string;
 }
 
 const InputGroup: React.FunctionComponent<InputGroupProps> = ({
@@ -29,6 +30,7 @@ const InputGroup: React.FunctionComponent<InputGroupProps> = ({
   onBlur,
   error = false,
   errorDetails,
+  className,
 }) => {
   return (
     <View style={styles.main}>
@@ -40,8 +42,11 @@ const InputGroup: React.FunctionComponent<InputGroupProps> = ({
         onBlur={onBlur}
         secureTextEntry={password}
         keyboardType={type}
+        className={className}
       />
-      {!!errorDetails && <Text style={styles.errorDetails}>{errorDetails}</Text>}
+      {!!errorDetails && (
+        <Text style={styles.errorDetails}>{errorDetails}</Text>
+      )}
     </View>
   );
 };
@@ -50,7 +55,7 @@ export default InputGroup;
 
 const styles = StyleSheet.create({
   main: {
-    justifyContent: 'center',
+    justifyContent: "center",
   },
   input: {
     backgroundColor: "#FFFFFF",

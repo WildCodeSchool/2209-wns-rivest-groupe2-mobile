@@ -43,27 +43,27 @@ export const GET_POI_BY_ID_QUERY = gql`
 `;
 
 interface ItemScreenProps {
-    route: {
-        "key": string,
-        "name": string,
-        "params": {
-          "param": {
-            "pictureUrl": string,
-            "rating": string,
-            "price_level": string,
-            "description": string,
-            "averageRate": string,
-            "websiteurl": string,
-          }
-        },
+  route: {
+    key: string;
+    name: string;
+    params: {
+      param: {
+        pictureUrl: string;
+        rating: string;
+        price_level: string;
+        description: string;
+        averageRate: string;
+        websiteurl: string;
+      };
     };
-  }
+  };
+}
 
 const ItemScreen: React.FC<ItemScreenProps> = ({ route }) => {
   const navigation = useNavigation();
   const data = route?.params.param;
 
-  console.log("ROUTE", route)
+  console.log("ROUTE", route);
 
   const [getPOIbyId, { loading, error, data: queryData }] =
     useLazyQuery(GET_POI_BY_ID_QUERY);
@@ -81,19 +81,19 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route }) => {
   const handlePress = () => {
     setIsRed(!isRed);
     if (isRed !== true) {
-        let toast = Toast.show('Ajouté aux vos favoris !', {
-            duration: Toast.durations.SHORT,
-            backgroundColor: "#D58574",
-            shadow: false,
-            position: 90,
-          });
+      let toast = Toast.show("Ajouté aux vos favoris !", {
+        duration: Toast.durations.SHORT,
+        backgroundColor: "#D58574",
+        shadow: false,
+        position: 90,
+      });
     } else {
-        let toast = Toast.show('Retiré des favoris !', {
-            duration: Toast.durations.SHORT,
-            backgroundColor: "#D58574",
-            shadow: false,
-            position: 90,
-          });
+      let toast = Toast.show("Retiré des favoris !", {
+        duration: Toast.durations.SHORT,
+        backgroundColor: "#D58574",
+        shadow: false,
+        position: 90,
+      });
     }
   };
 
@@ -111,13 +111,7 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route }) => {
             className="w-full h-72 object-cover rounded-2xl"
           />
 
-          <View className="absolute flex-row inset-x-0 top-5 justify-between px-4">
-            <TouchableOpacity
-              onPress={() => navigation.navigate("Découvrir" as never)}
-              className="w-10 h-10 rounded-md items-center justify-center bg-white"
-            >
-              <Ionicons name="chevron-back-outline" size={24} color="#44bdbe" />
-            </TouchableOpacity>
+          <View className="absolute top-5 right-5">
             <TouchableOpacity
               onPress={handlePress}
               className="w-10 h-10 rounded-md items-center justify-center bg-[#06B2BE]"
@@ -192,7 +186,6 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route }) => {
               </View>
             </View>
           )}
-
         </View>
 
         {data?.description && (

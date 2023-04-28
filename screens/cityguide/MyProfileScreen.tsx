@@ -1,6 +1,5 @@
-import { Button } from "@react-native-material/core";
 import React, { useCallback, useLayoutEffect, useState } from "react";
-import { SafeAreaView, View, StyleSheet } from "react-native";
+import { SafeAreaView, View, StyleSheet, Button } from "react-native";
 import { Text, Modal } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import AvatarImagePicker from "../../components/AvatarImagePicker";
@@ -114,44 +113,50 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
           <Ionicons name="heart" color="black" size={30} />
         </View>
       </View>
-
       <View style={styles.subContainer}>
-        <View className="p-5">
-          <Text className="text-[30px] text-[#0B646B] font-semibold">
-            Bonjour {user?.userFromDB.firstname}
-          </Text>
-          <Text className="text-[15px] text-[#527873]">
-            Que va t'on découvrir aujourd'hui ?
-          </Text>
-        </View>
         <ScrollView>
-          <View className="px-4 flex-row items-center justify-evenly flex-wrap mt-4">
+          <View className="p-5">
+            <Text className="text-[30px] text-[#0B646B] font-semibold">
+              Bonjour {user?.userFromDB.firstname}
+            </Text>
+            <Text className="text-[15px] text-[#527873]">
+              Vos points d'intérêts favoris !
+            </Text>
+          </View>
+          <View className="px-4 flex-row items-center justify-evenly flex-wrap">
             {pois?.length > 0 ? (
-              pois?.map((poi, i) => (
-                <ItemCardContainer
-                  key={i}
-                  id={poi.id}
-                  pictureUrl={
-                    poi?.pictureUrl
-                      ? poi?.pictureUrl
-                      : "https://cdn.pixabay.com/photo/2015/10/30/12/22/eat-1014025_1280.jpg"
-                  }
-                  name={poi.name}
-                  address={poi.address}
-                  postal={poi.postal}
-                />
-              ))
+              pois
+                ?.slice(0, 5)
+                .map((poi, i) => (
+                  <ItemCardContainer
+                    key={i}
+                    id={poi.id}
+                    pictureUrl={
+                      poi?.pictureUrl
+                        ? poi?.pictureUrl
+                        : "https://cdn.pixabay.com/photo/2015/10/30/12/22/eat-1014025_1280.jpg"
+                    }
+                    name={poi.name}
+                    address={poi.address}
+                    postal={poi.postal}
+                    isFavorite={true}
+                  />
+                ))
             ) : (
               <>
                 <View className="w-full h-[400px] bg-gray-200 placeholder:items-center space-y-8 justify-center">
                   <Text className="text-2xl text-[#428288] font-semibold">
-                    Ooops... No Data Found
+                    Vous n'avez pas de favoris enregistrés
                   </Text>
                 </View>
               </>
             )}
           </View>
-          <Button onPress={logout} title={"Se déconnecter"} />
+          <View className="my-4">
+            <View className="w-[60%] mx-auto">
+              <Button title="SE DECONNECTER" color="#44bdbe" onPress={logout} />
+            </View>
+          </View>
         </ScrollView>
       </View>
       <Modal
@@ -192,6 +197,7 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
                   placeholder="Mot de passe"
                   error={!!error}
                   errorDetails={error?.message}
+                  className="border border-teal-400"
                 />
               </View>
             )}
