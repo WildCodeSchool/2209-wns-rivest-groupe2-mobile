@@ -1,9 +1,12 @@
 import React, { useCallback, useLayoutEffect, useState } from "react";
-import { StyleSheet, Text, SafeAreaView } from "react-native";
+import { StyleSheet, Text, SafeAreaView, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client";
 import { useFocusEffect } from "@react-navigation/native";
+import HeaderLocation from "../../components/HeaderLocation";
+import { View } from "react-native-animatable";
+import { Ionicons } from "@expo/vector-icons";
 
 export const GET_POI_QUERY = gql`
   query GetAllPois {
@@ -72,22 +75,22 @@ const MapScreen = ({ navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-        <MapView style={styles.map} initialRegion={parisPosition}>
-          {pois
-            ? pois.map((poi) => (
-                <Marker
-                  coordinate={{
-                    latitude: poi.coordinates[0],
-                    longitude: poi.coordinates[1],
-                  }}
-                  title={poi.name}
-                  description={poi.description}
-                  key={poi.id}
-                />
-              ))
-            : null}
-        </MapView>
+    <SafeAreaView className="flex items-center" style={styles.container}>
+      <MapView style={styles.map} initialRegion={parisPosition}>
+        {pois
+          ? pois.map((poi) => (
+              <Marker
+                coordinate={{
+                  latitude: poi.coordinates[0],
+                  longitude: poi.coordinates[1],
+                }}
+                title={poi.name}
+                description={poi.description}
+                key={poi.id}
+              />
+            ))
+          : null}
+      </MapView>
     </SafeAreaView>
   );
 };
@@ -97,9 +100,6 @@ export default MapScreen;
 const styles = StyleSheet.create({
   container: {
     ...StyleSheet.absoluteFillObject,
-    flex: 1, //the container will fill the whole screen.
-    justifyContent: "flex-end",
-    alignItems: "center",
   },
   map: {
     ...StyleSheet.absoluteFillObject,

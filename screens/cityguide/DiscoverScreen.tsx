@@ -1,13 +1,15 @@
 import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import MenuContainer from "../../components/MenuContainer";
-import { Hotels, Restaurants, Bars } from "../../assets/images";
 import { GET_POI_QUERY } from "../../services/queries/Poi";
+import { Hotels, Restaurants, Musee } from "../../assets/images";
 import { useLazyQuery } from "@apollo/client";
 import { useFocusEffect } from "@react-navigation/native";
 import ItemCardContainer from "../../components/ItemCardContainer";
+import { IPOIData } from "../../types/IPoiData";
 
 const DiscoverScreen = ({ navigation }) => {
+
   //DISABLE TOP NAVIGATION
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -15,16 +17,16 @@ const DiscoverScreen = ({ navigation }) => {
     });
   }, []);
 
+  //FETCH DATA
   const [getAllPois, { loading, error }] = useLazyQuery(GET_POI_QUERY);
-  const [pois, setPois] = useState([]);
+  const [pois, setPois] = useState<IPOIData[] | []>([]);
 
   useFocusEffect(
     useCallback(() => {
       async function fetchPois() {
         try {
           const data = await getAllPois();
-          const dataPois = [...data.data.getAllPoi];
-
+          const dataPois = [...data.data.getAllPoi] as IPOIData[];
           setPois(dataPois);
         } catch (error) {
           console.log(error);
@@ -35,7 +37,9 @@ const DiscoverScreen = ({ navigation }) => {
     }, [])
   );
 
-  const [type, setType] = useState("restaurants");
+  //FILTER DATA
+  const [type, setType] = useState<string>("");
+  const [isFiltered, setIsFiltered] = useState<boolean>(false);
 
   return (
     <SafeAreaView>
@@ -52,34 +56,42 @@ const DiscoverScreen = ({ navigation }) => {
       </View>
       <ScrollView>
         <View className="flex-row items-center justify-between px-8 mt-8">
-          <MenuContainer
-            key={"hotels"}
-            title="Hotels"
-            imageSrc={Hotels}
-            type={type}
-            setType={setType}
-          />
-          <MenuContainer
-            key={"bars"}
-            title="Bars"
-            imageSrc={Bars}
-            type={type}
-            setType={setType}
-          />
-          <MenuContainer
-            key={"restaurants"}
-            title="Restaurants"
-            imageSrc={Restaurants}
-            type={type}
-            setType={setType}
-          />
+            <MenuContainer
+              key={"hotel"}
+              title="Hotel"
+              imageSrc={Hotels}
+              type={type}
+              setType={setType}
+              setIsFiltered={setIsFiltered}
+              isFiltered={isFiltered}
+            />
+            <MenuContainer
+              key={"musee"}
+              title="Musee"
+              imageSrc={Musee}
+              type={type}
+              setType={setType}
+              setIsFiltered={setIsFiltered}
+              isFiltered={isFiltered}
+            />
+            <MenuContainer
+              key={"restaurant"}
+              title="Restaurant"
+              imageSrc={Restaurants}
+              type={type}
+              setType={setType}
+              setIsFiltered={setIsFiltered}
+              isFiltered={isFiltered}
+            />
         </View>
 
         {/* Cards container */}
-        <View className="px-4 flex-row items-center justify-evenly flex-wrap mt-4">
+        <View className="px-4 flex-row items-center justify-evenly flex-wrap mt-4 mb-36">
           {pois?.length > 0 ? (
             <>
-              {pois?.map((poi, i) => (
+              {isFiltered ?
+              pois?.filter((poi: any, i) => (poi.type == type))
+              .map((poi, i) => (
                 <ItemCardContainer
                   key={i}
                   id={poi?.id}
@@ -92,17 +104,29 @@ const DiscoverScreen = ({ navigation }) => {
                   address={poi?.address}
                   postal={poi?.postal}
                 />
-              ))}
+              )) : (
+                pois?.map((poi, i) => (
+                  <ItemCardContainer
+                    key={i}
+                    id={poi?.id}
+                    pictureUrl={
+                      poi?.pictureUrl
+                        ? poi?.pictureUrl
+                        : "https://cdn.pixabay.com/photo/2015/10/30/12/22/eat-1014025_1280.jpg"
+                    }
+                    name={poi?.name}
+                    address={poi?.address}
+                    postal={poi?.postal}
+                  />
+                ))
+              )
+              }
             </>
           ) : (
             <>
               <View className="w-full h-[400px] bg-gray-200 placeholder:items-center space-y-8 justify-center">
-                {/* <Image
-                      source={NotFound}
-                      className="w-28 h-28 object-cover"
-                    /> */}
                 <Text className="text-2xl text-[#428288] font-semibold">
-                  Ooops... No Data Found
+                  Ooops... Pas de points enregistrés !
                 </Text>
               </View>
             </>

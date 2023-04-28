@@ -4,12 +4,12 @@ import { useNavigation } from "@react-navigation/native";
 import React from "react";
 
 interface ItemCardContainerProps {
-  id: string;
+  id: number;
   name: string;
   pictureUrl: string;
   address: string;
-  postal: number;
-  isFavorite: boolean;
+  postal: string;
+  isFavorite?: boolean;
 }
 
 const ItemCardContainer: React.FC<ItemCardContainerProps> = ({

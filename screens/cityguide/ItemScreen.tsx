@@ -12,6 +12,7 @@ import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client";
 import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-root-toast";
+import { ItemScreenProps } from "../../types/ItemScreenProps";
 
 export const GET_POI_BY_ID_QUERY = gql`
   query getPOIbyId($getPoIbyIdId: Float!) {
@@ -42,28 +43,9 @@ export const GET_POI_BY_ID_QUERY = gql`
   }
 `;
 
-interface ItemScreenProps {
-  route: {
-    key: string;
-    name: string;
-    params: {
-      param: {
-        pictureUrl: string;
-        rating: string;
-        price_level: string;
-        description: string;
-        averageRate: string;
-        websiteurl: string;
-      };
-    };
-  };
-}
-
 const ItemScreen: React.FC<ItemScreenProps> = ({ route }) => {
   const navigation = useNavigation();
   const data = route?.params.param;
-
-  console.log("ROUTE", route);
 
   const [getPOIbyId, { loading, error, data: queryData }] =
     useLazyQuery(GET_POI_BY_ID_QUERY);

@@ -9,8 +9,17 @@ import RegisterScreen from '../screens/cityguide/RegisterScreen';
 import { ROUTES } from '../constants';
 import DrawerNavigator from './DrawerNavigator';
 import ItemScreen from '../screens/cityguide/ItemScreen';
+import { ItemScreenProps } from '../types/ItemScreenProps'
 
-const Stack = createStackNavigator();
+type RootStackParamList = {
+  Splash: undefined;
+  CityGuideScreen: undefined;
+  ProfileNavigator: undefined;
+  DrawerNavigator: undefined;
+  ItemScreen: ItemScreenProps;
+};
+
+const Stack = createStackNavigator<RootStackParamList>();
 
 const Navigator = () => {
   return (
