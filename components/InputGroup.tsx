@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 interface InputGroupProps {
   label?: string;
@@ -17,6 +18,7 @@ interface InputGroupProps {
   onBlur?: () => void;
   error?: boolean;
   errorDetails?: string;
+  className?: string;
 }
 
 const InputGroup: React.FunctionComponent<InputGroupProps> = ({
@@ -28,6 +30,7 @@ const InputGroup: React.FunctionComponent<InputGroupProps> = ({
   onBlur,
   error = false,
   errorDetails,
+  className,
 }) => {
   return (
     <View style={styles.main}>
@@ -39,8 +42,11 @@ const InputGroup: React.FunctionComponent<InputGroupProps> = ({
         onBlur={onBlur}
         secureTextEntry={password}
         keyboardType={type}
+        className={className}
       />
-      {!!errorDetails && <Text style={styles.errorDetails}>{errorDetails}</Text>}
+      {!!errorDetails && (
+        <Text style={styles.errorDetails}>{errorDetails}</Text>
+      )}
     </View>
   );
 };
@@ -49,8 +55,7 @@ export default InputGroup;
 
 const styles = StyleSheet.create({
   main: {
-    // paddingTop: "0.5rem",
-    // paddingBottom: "0.5rem",
+    justifyContent: "center",
   },
   input: {
     backgroundColor: "#FFFFFF",
@@ -62,9 +67,9 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   errorDetails: {
-    //marginTop: "0.25rem",
     color: "#EF4444",
-    //fontSize: "0.875rem",
-    //lineHeight: "1.25rem",
+    marginLeft: 25,
+    marginRight: 25,
+    padding: 5,
   },
 });
