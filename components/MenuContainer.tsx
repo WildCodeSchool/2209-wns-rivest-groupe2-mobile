@@ -27,7 +27,7 @@ const MenuContainer: React.FC<MenuContainerProps> = ({ title, imageSrc, type, se
     >
       <View
         className={`w-20 h-20 p-2 shadow-sm rounded-full items-center justify-center ${
-          type === title.toLowerCase() && isFiltered == true ? "bg-gray-200" : ""
+          type === title.toLowerCase() && isFiltered === true ? "bg-gray-200" : ""
         }`}
       >
         <Image source={ imageSrc } className="w-full h-full object-contain" />

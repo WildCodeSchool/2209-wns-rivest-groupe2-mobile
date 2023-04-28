@@ -154,12 +154,8 @@ const DiscoverScreen = ({ navigation }) => {
           ) : (
             <>
               <View className="w-full h-[400px] bg-gray-200 placeholder:items-center space-y-8 justify-center">
-                {/* <Image
-                      source={NotFound}
-                      className="w-28 h-28 object-cover"
-                    /> */}
                 <Text className="text-2xl text-[#428288] font-semibold">
-                  Ooops... No Data Found
+                  Ooops... Pas de points enregistrés !
                 </Text>
               </View>
             </>
