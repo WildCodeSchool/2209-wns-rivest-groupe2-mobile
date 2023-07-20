@@ -13,8 +13,13 @@ export interface UserFromDb {
   id: number;
   lastname?: string;
   profilePicture?: string;
-  type: string;
   username?: string;
+  role:  IRole;
+}
+
+export interface IRole {
+  id: number;
+  name: string;
 }
 export interface IUser {
   __typename: string;

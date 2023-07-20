@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useState } from "react";
 import * as yup from "yup";
-import { gql, useMutation } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import {
   SafeAreaView,
   View,
@@ -20,25 +20,7 @@ import { userState } from "../../atom/userAtom";
 import { IUserForm } from "../../types/IUser";
 import { ROUTES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
-
-// MUTATION APOLLO
-const CREATE_USER = gql`
-  mutation Mutation($email: String!, $password: String!) {
-    createUser(email: $email, password: $password) {
-      token
-      userFromDB {
-        id
-        email
-        username
-        type
-        firstname
-        lastname
-        hashedPassword
-        profilePicture
-      }
-    }
-  }
-`;
+import { CREATE_USER } from "../../services/mutations/User";
 
 // FN SECURE STORE
 async function saveTokenInSecureStore(key: string, value: string) {
@@ -67,6 +49,13 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
   // VALIDATION SCHEMA
   const validationSchema = yup
     .object({
+      username: yup
+      .string()
+      .required('Merci de renseigner un identifiant.')
+      .matches(
+        /^[aA-zZ\s]+$/,
+        `Veuillez n'utiliser que des lettres de l'alphabet.`
+      ),
       email: yup
         .string()
         .email()
@@ -93,6 +82,7 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
   // MUTATION - SUBMISSION
   const [signUp] = useMutation(CREATE_USER, {
     onCompleted(data) {
+      console.log(data)
       saveTokenInSecureStore("token", data.createUser.token);
       setUser(data.createUser);
       navigation.navigate(ROUTES.MYPROFILE);
@@ -104,11 +94,14 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
   });
 
   const onSubmit: SubmitHandler<IUserForm> = async (fields: {
+    username: string;
     email: string;
     password: string;
   }) => {
+    console.log(fields)
     signUp({
       variables: {
+        username: fields.username,
         email: fields.email,
         password: fields.password,
       },
@@ -154,6 +147,23 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
                     onChangeText={onChange}
                     value={value}
                     placeholder="Email"
+                    error={!!error}
+                    errorDetails={error?.message}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="username"
+                render={({
+                  field: { onChange, onBlur, value },
+                  fieldState: { error },
+                }) => (
+                  <InputGroup
+                    onBlur={onBlur}
+                    onChangeText={onChange}
+                    value={value}
+                    placeholder="Username"
                     error={!!error}
                     errorDetails={error?.message}
                   />
