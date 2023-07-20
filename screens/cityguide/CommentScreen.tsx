@@ -80,7 +80,6 @@ const CommentScreen = ({ route }) => {
         });
         setIsEditing(false);
       } catch (error) {
-        console.log("error updating comment: ", error);
         Alert.alert(`Failed to update comment: ${error.message}`);
       }
     };
@@ -89,18 +88,13 @@ const CommentScreen = ({ route }) => {
     try {
       await deleteComment({ variables: { commentId: userComment.id } });
     } catch (error) {
-      console.log("error delete message: ", error)
       Alert.alert(`Failed to delete comment: ${error.message}`);
     }
   };
 
   const handleAddComment = async () => {
     try {
-      console.log('userToken', user.token)
-      console.log("poiId", poiId)
-      console.log("userId", user.userFromDB.id)
-      console.log('comment', comment)
-      console.log('rating', rating)
+
       await commentPOI({
         variables: {
           poiId: poiId,
@@ -110,8 +104,6 @@ const CommentScreen = ({ route }) => {
         }
       });
     } catch (error) {
-      console.log("error add message: ", error)
-
       Alert.alert(`Failed to add comment: ${error.message}`);
     }
   };
