@@ -6,4 +6,5 @@ export default {
     MAP: 'Carte',
     DRAWER_NAVIGATOR: 'Drawer Navigator',
     PROFILE_NAVIGATOR: 'Profile Navigator',
+    COMMENT: 'Comment Screen'
 };

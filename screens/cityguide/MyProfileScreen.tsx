@@ -99,11 +99,11 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
             {user?.userFromDB.firstname || user?.userFromDB.email}
           </Text>
           <Text className="text-sm">
-            {user?.userFromDB.type === "freeUser"
+            {user?.userFromDB?.role?.name === "freeUser"
               ? "Free user"
-              : user?.userFromDB.type === "admin"
+              : user?.userFromDB?.role?.name === "admin"
               ? "admin"
-              : user?.userFromDB.type === "paidUser"
+              : user?.userFromDB?.role?.name === "paidUser"
               ? "Paid User"
               : ""}
           </Text>

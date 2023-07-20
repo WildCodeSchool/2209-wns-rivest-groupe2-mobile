@@ -10,6 +10,7 @@ import { ROUTES } from '../constants';
 import DrawerNavigator from './DrawerNavigator';
 import ItemScreen from '../screens/cityguide/ItemScreen';
 import { ItemScreenProps } from '../types/ItemScreenProps'
+import CommentScreen from '../screens/cityguide/CommentScreen';
 
 type RootStackParamList = {
   Splash: undefined;
@@ -17,6 +18,7 @@ type RootStackParamList = {
   ProfileNavigator: undefined;
   DrawerNavigator: undefined;
   ItemScreen: ItemScreenProps;
+  CommentScreen: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -30,6 +32,7 @@ const Navigator = () => {
         <Stack.Screen name="ProfileNavigator" component={ProfileNavigator} />
         <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
         <Stack.Screen name="ItemScreen" component={ItemScreen} />
+        <Stack.Screen name="CommentScreen" component={CommentScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   )
