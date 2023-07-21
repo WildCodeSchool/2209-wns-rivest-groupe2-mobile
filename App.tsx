@@ -12,6 +12,7 @@ import { RootSiblingParent } from "react-native-root-siblings";
 import * as SecureStore from "expo-secure-store";
 import { BASE_URL_API } from "@env";
 
+
 async function getValueFor(key: string): Promise<string | null> {
   let result = await SecureStore.getItemAsync(key);
   if (result) {
@@ -22,15 +23,19 @@ async function getValueFor(key: string): Promise<string | null> {
 }
 
 export default function App() {
-  const uri = BASE_URL_API;
+  const uri = BASE_URL_API
   const httpLink = createHttpLink({ uri: uri });
 
+  console.log("process.env", process.env)
+
+  console.log("URI ===", uri)
+  console.log("HTTPLINK===", httpLink)
   const authLink = setContext(async (_, { headers }) => {
     const token = await getValueFor("token");
     return {
       headers: {
         ...headers,
-        authorization: token !== null ? `${token}` : "",
+        authorization: token ? `Bearer ${token}` : '',
       },
     };
   });
@@ -40,9 +45,10 @@ export default function App() {
   }; */
 
   const client = new ApolloClient({
-    uri: BASE_URL_API,
+    link: authLink.concat(httpLink),
     cache: new InMemoryCache(),
   });
+  
   return (
     <ApolloProvider client={client}>
       <RootSiblingParent>

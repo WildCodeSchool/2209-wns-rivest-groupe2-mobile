@@ -1,12 +1,12 @@
 import { View, Text, SafeAreaView, ScrollView } from "react-native";
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import MenuContainer from "../../components/MenuContainer";
-import { GET_POI_QUERY } from "../../services/queries/Poi";
 import { Hotels, Restaurants, Musee } from "../../assets/images";
 import { useLazyQuery } from "@apollo/client";
 import { useFocusEffect } from "@react-navigation/native";
 import ItemCardContainer from "../../components/ItemCardContainer";
 import { IPOIData } from "../../types/IPoiData";
+import { GET_POI_QUERY } from "../../services/queries/Poi";
 
 const DiscoverScreen = ({ navigation }) => {
 

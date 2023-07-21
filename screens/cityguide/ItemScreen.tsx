@@ -5,47 +5,50 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
+  Button,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useLayoutEffect, useState } from "react";
+import React, { useState } from "react";
 import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client";
-import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-root-toast";
 import { ItemScreenProps } from "../../types/ItemScreenProps";
+import { useRecoilValue } from "recoil";
+import { userState } from "../../atom/userAtom";
 
 export const GET_POI_BY_ID_QUERY = gql`
-  query getPOIbyId($getPoIbyIdId: Float!) {
-    getPOIbyId(id: $getPoIbyIdId) {
+query Query($getPoIbyIdId: Float!) {
+  getPOIbyId(id: $getPoIbyIdId) {
+    id
+    name
+    address
+    postal
+    type
+    coordinates
+    creationDate
+    averageRate
+    pictureUrl
+    websiteURL
+    description
+    openingHours {
       id
+      value
       name
-      address
-      postal
-      type
-      coordinates
-      creationDate
-      averageRate
-      pictureUrl
-      websiteURL
-      description
-      priceRange
-      city
-      daysOpen
       hoursOpen
       hoursClose
-      getRates {
-        id
-        rate
-        createDate
-        updateDate
-      }
+    }
+    city {
+      id
+      name
+      coordinates
     }
   }
+}
 `;
 
-const ItemScreen: React.FC<ItemScreenProps> = ({ route }) => {
-  const navigation = useNavigation();
+const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
   const data = route?.params.param;
+  const user = useRecoilValue(userState);
 
   const [getPOIbyId, { loading, error, data: queryData }] =
     useLazyQuery(GET_POI_BY_ID_QUERY);
@@ -201,6 +204,13 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route }) => {
               Réserver
             </Text>
           </View>
+          {user && (
+        <Button 
+          title="Commentaires" 
+          onPress={() => navigation.navigate('CommentScreen', { poiId: poi.id })}
+        />
+      )}
+
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -1,34 +1,9 @@
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import { StyleSheet, Text, SafeAreaView, TouchableOpacity } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client";
 import { useFocusEffect } from "@react-navigation/native";
-import HeaderLocation from "../../components/HeaderLocation";
-import { View } from "react-native-animatable";
-import { Ionicons } from "@expo/vector-icons";
-
-export const GET_POI_QUERY = gql`
-  query GetAllPois {
-    getAllPoi {
-      id
-      name
-      address
-      postal
-      type
-      coordinates
-      creationDate
-      pictureUrl
-      websiteURL
-      description
-      priceRange
-      city
-      daysOpen
-      hoursOpen
-      hoursClose
-    }
-  }
-`;
+import { GET_POI_QUERY } from "../../services/queries/Poi";
 
 const MapScreen = ({ navigation }) => {
   const [getAllPois, { loading, error }] = useLazyQuery(GET_POI_QUERY);
