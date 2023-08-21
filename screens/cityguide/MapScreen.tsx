@@ -29,6 +29,8 @@ const MapScreen = ({ navigation }) => {
         try {
           const data = await getAllPois();
 
+          console.log("data", data);
+
           const dataPois = [...data.data.getAllPoi];
 
           setPois(dataPois);

@@ -9,7 +9,6 @@ import { IPOIData } from "../../types/IPoiData";
 import { GET_POI_QUERY } from "../../services/queries/Poi";
 
 const DiscoverScreen = ({ navigation }) => {
-
   //DISABLE TOP NAVIGATION
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -26,6 +25,7 @@ const DiscoverScreen = ({ navigation }) => {
       async function fetchPois() {
         try {
           const data = await getAllPois();
+          console.log("data", data);
           const dataPois = [...data.data.getAllPoi] as IPOIData[];
           setPois(dataPois);
         } catch (error) {
@@ -56,71 +56,70 @@ const DiscoverScreen = ({ navigation }) => {
       </View>
       <ScrollView>
         <View className="flex-row items-center justify-between px-8 mt-8">
-            <MenuContainer
-              key={"hotel"}
-              title="Hotel"
-              imageSrc={Hotels}
-              type={type}
-              setType={setType}
-              setIsFiltered={setIsFiltered}
-              isFiltered={isFiltered}
-            />
-            <MenuContainer
-              key={"musee"}
-              title="Musee"
-              imageSrc={Musee}
-              type={type}
-              setType={setType}
-              setIsFiltered={setIsFiltered}
-              isFiltered={isFiltered}
-            />
-            <MenuContainer
-              key={"restaurant"}
-              title="Restaurant"
-              imageSrc={Restaurants}
-              type={type}
-              setType={setType}
-              setIsFiltered={setIsFiltered}
-              isFiltered={isFiltered}
-            />
+          <MenuContainer
+            key={"hotel"}
+            title="Hotel"
+            imageSrc={Hotels}
+            type={type}
+            setType={setType}
+            setIsFiltered={setIsFiltered}
+            isFiltered={isFiltered}
+          />
+          <MenuContainer
+            key={"musee"}
+            title="Musee"
+            imageSrc={Musee}
+            type={type}
+            setType={setType}
+            setIsFiltered={setIsFiltered}
+            isFiltered={isFiltered}
+          />
+          <MenuContainer
+            key={"restaurant"}
+            title="Restaurant"
+            imageSrc={Restaurants}
+            type={type}
+            setType={setType}
+            setIsFiltered={setIsFiltered}
+            isFiltered={isFiltered}
+          />
         </View>
 
         {/* Cards container */}
         <View className="px-4 flex-row items-center justify-evenly flex-wrap mt-4 mb-36">
           {pois?.length > 0 ? (
             <>
-              {isFiltered ?
-              pois?.filter((poi: any, i) => (poi.type == type))
-              .map((poi, i) => (
-                <ItemCardContainer
-                  key={i}
-                  id={poi?.id}
-                  pictureUrl={
-                    poi?.pictureUrl
-                      ? poi?.pictureUrl
-                      : "https://cdn.pixabay.com/photo/2015/10/30/12/22/eat-1014025_1280.jpg"
-                  }
-                  name={poi?.name}
-                  address={poi?.address}
-                  postal={poi?.postal}
-                />
-              )) : (
-                pois?.map((poi, i) => (
-                  <ItemCardContainer
-                    key={i}
-                    id={poi?.id}
-                    pictureUrl={
-                      poi?.pictureUrl
-                        ? poi?.pictureUrl
-                        : "https://cdn.pixabay.com/photo/2015/10/30/12/22/eat-1014025_1280.jpg"
-                    }
-                    name={poi?.name}
-                    address={poi?.address}
-                    postal={poi?.postal}
-                  />
-                ))
-              )
-              }
+              {isFiltered
+                ? pois
+                    ?.filter((poi: any, i) => poi.type == type)
+                    .map((poi, i) => (
+                      <ItemCardContainer
+                        key={i}
+                        id={poi?.id}
+                        pictureUrl={
+                          poi?.pictureUrl
+                            ? poi?.pictureUrl
+                            : "https://cdn.pixabay.com/photo/2015/10/30/12/22/eat-1014025_1280.jpg"
+                        }
+                        name={poi?.name}
+                        address={poi?.address}
+                        postal={poi?.postal}
+                      />
+                    ))
+                : pois?.map((poi, i) => (
+                    <ItemCardContainer
+                      key={i}
+                      id={poi?.id}
+                      pictureUrl={
+                        poi?.pictureUrl
+                          ? poi?.pictureUrl
+                          : "https://cdn.pixabay.com/photo/2015/10/30/12/22/eat-1014025_1280.jpg"
+                      }
+                      name={poi?.name}
+                      address={poi?.address}
+                      postal={poi?.postal}
+                    />
+                  ))}
             </>
           ) : (
             <>

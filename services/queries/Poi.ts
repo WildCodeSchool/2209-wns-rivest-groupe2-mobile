@@ -42,34 +42,35 @@ export const GET_POI_QUERY = gql`
 `;
 
 export const GET_POI_BY_ID = gql`
-query GetPOIbyId($getPoIbyIdId: Float!) {
-  getPOIbyId(id: $getPoIbyIdId) {
-    id
-    name
-    address
-    postal
-    type
-    coordinates
-    creationDate
-    averageRate
-    pictureUrl
-    websiteURL
-    description
-    city
-    comments {
+  query GetPOIbyId($getPoIbyIdId: Float!) {
+    getPOIbyId(id: $getPoIbyIdId) {
       id
-      createDate
-      updateDate
-      text
-      rate
-      user {
+      name
+      address
+      postal
+      type
+      coordinates
+      creationDate
+      averageRate
+      pictureUrl
+      websiteURL
+      description
+      city
+      comments {
         id
-        username
-        profilePicture
+        createDate
+        updateDate
+        text
+        rate
+        user {
+          id
+          username
+          profilePicture
+        }
       }
     }
   }
-}`
+`;
 
 export const GET_USER_COMMENT_POI_QUERY = gql`
   query Query($userId: Float!, $poiId: Float!) {
