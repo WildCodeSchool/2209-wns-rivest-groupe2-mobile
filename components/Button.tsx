@@ -4,15 +4,10 @@ import { LinearGradient } from "expo-linear-gradient";
 
 interface ButtonProps {
   children: string;
-  type?: "primary";
   onPress: () => void;
 }
 
-const Button: React.FC<ButtonProps> = ({
-  type = "primary",
-  children,
-  onPress,
-}) => {
+const Button: React.FC<ButtonProps> = ({ children, onPress }) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <View>

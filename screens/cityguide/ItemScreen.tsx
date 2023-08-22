@@ -9,49 +9,18 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
-import { gql } from "@apollo/client";
 import { useLazyQuery } from "@apollo/client";
 import Toast from "react-native-root-toast";
 import { ItemScreenProps } from "../../types/ItemScreenProps";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../atom/userAtom";
-
-export const GET_POI_BY_ID_QUERY = gql`
-query Query($getPoIbyIdId: Float!) {
-  getPOIbyId(id: $getPoIbyIdId) {
-    id
-    name
-    address
-    postal
-    type
-    coordinates
-    creationDate
-    averageRate
-    pictureUrl
-    websiteURL
-    description
-    openingHours {
-      id
-      value
-      name
-      hoursOpen
-      hoursClose
-    }
-    city {
-      id
-      name
-      coordinates
-    }
-  }
-}
-`;
+import { GET_POI_BY_ID_QUERY } from "../../services/queries/Poi";
 
 const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
   const data = route?.params.param;
   const user = useRecoilValue(userState);
 
-  const [getPOIbyId, { loading, error, data: queryData }] =
-    useLazyQuery(GET_POI_BY_ID_QUERY);
+  const [getPOIbyId, { data: queryData }] = useLazyQuery(GET_POI_BY_ID_QUERY);
 
   React.useEffect(() => {
     if (data) {
@@ -66,14 +35,14 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
   const handlePress = () => {
     setIsRed(!isRed);
     if (isRed !== true) {
-      let toast = Toast.show("Ajouté aux vos favoris !", {
+      Toast.show("Ajouté aux vos favoris !", {
         duration: Toast.durations.SHORT,
         backgroundColor: "#D58574",
         shadow: false,
         position: 90,
       });
     } else {
-      let toast = Toast.show("Retiré des favoris !", {
+      Toast.show("Retiré des favoris !", {
         duration: Toast.durations.SHORT,
         backgroundColor: "#D58574",
         shadow: false,
@@ -188,7 +157,6 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
               </Text>
             </View>
           )}
-          {/* {poi?.averageRate && ( */}
           <View className="items-center flex-row space-x-4 mb-4">
             <Ionicons name="star-outline" size={24} color="#D58574" />
             <Text className="text-[#D58574] text-[13px] font-bold">
@@ -197,7 +165,6 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
                 : "Pas de notes disponibles"}
             </Text>
           </View>
-          {/* )} */}
 
           <View className="py-2 rounded-lg bg-[#06B2BE] items-center justify-center">
             <Text className="text-xl font-semibold uppercase tracking-wider text-gray-100">
@@ -205,12 +172,13 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
             </Text>
           </View>
           {user && (
-        <Button 
-          title="Commentaires" 
-          onPress={() => navigation.navigate('CommentScreen', { poiId: poi.id })}
-        />
-      )}
-
+            <Button
+              title="Commentaires"
+              onPress={() =>
+                navigation.navigate("CommentScreen", { poiId: poi.id })
+              }
+            />
+          )}
         </View>
       </ScrollView>
     </SafeAreaView>

@@ -6,7 +6,6 @@ import {
   View,
   StyleSheet,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
 
 interface InputGroupProps {
   label?: string;
@@ -16,7 +15,6 @@ interface InputGroupProps {
   type?: KeyboardTypeOptions;
   onChangeText: (value: string) => void;
   onBlur?: () => void;
-  error?: boolean;
   errorDetails?: string;
   className?: string;
 }
@@ -28,7 +26,6 @@ const InputGroup: React.FunctionComponent<InputGroupProps> = ({
   type = "default",
   onChangeText,
   onBlur,
-  error = false,
   errorDetails,
   className,
 }) => {

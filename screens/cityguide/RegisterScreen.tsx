@@ -50,12 +50,12 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
   const validationSchema = yup
     .object({
       username: yup
-      .string()
-      .required('Merci de renseigner un identifiant.')
-      .matches(
-        /^[aA-zZ\s]+$/,
-        `Veuillez n'utiliser que des lettres de l'alphabet.`
-      ),
+        .string()
+        .required("Merci de renseigner un identifiant.")
+        .matches(
+          /^[aA-zZ\s]+$/,
+          `Veuillez n'utiliser que des lettres de l'alphabet.`
+        ),
       email: yup
         .string()
         .email()
@@ -82,7 +82,7 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
   // MUTATION - SUBMISSION
   const [signUp] = useMutation(CREATE_USER, {
     onCompleted(data) {
-      console.log(data)
+      console.log(data);
       saveTokenInSecureStore("token", data.createUser.token);
       setUser(data.createUser);
       navigation.navigate(ROUTES.MYPROFILE);
@@ -98,7 +98,7 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
     email: string;
     password: string;
   }) => {
-    console.log(fields)
+    console.log(fields);
     signUp({
       variables: {
         username: fields.username,
@@ -108,12 +108,7 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
     });
   };
 
-  const {
-    control,
-    handleSubmit,
-    clearErrors,
-    formState: { errors },
-  } = useForm<IUserForm>({
+  const { control, handleSubmit } = useForm<IUserForm>({
     mode: "onBlur",
     resolver: yupResolver(validationSchema),
   });

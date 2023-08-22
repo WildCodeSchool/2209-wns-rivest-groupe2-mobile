@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useState } from "react";
 import { SafeAreaView, View, StyleSheet, Button } from "react-native";
-import { Text, Modal } from "react-native-paper";
+import { Text /* Modal */ } from "react-native-paper";
 import { Ionicons } from "@expo/vector-icons";
 import AvatarImagePicker from "../../components/AvatarImagePicker";
 import * as SecureStore from "expo-secure-store";
@@ -13,19 +13,19 @@ import ItemCardContainer from "../../components/ItemCardContainer";
 import { ScrollView } from "react-native-gesture-handler";
 import { UPDATE_USER_MUTATION } from "../../services/mutations/User";
 import { saveTokenInSecureStore } from "./LoginScreen";
-import { Controller, useForm } from "react-hook-form";
-import InputGroup from "../../components/InputGroup";
+/* import { Controller, useForm } from "react-hook-form";
+import InputGroup from "../../components/InputGroup"; */
 
 const MyProfileScreen: React.FC = ({ navigation }: any) => {
-  const [visible, setVisible] = React.useState(false);
+  /*  const [visible, setVisible] = React.useState(false);
 
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
-  const containerStyle = { backgroundColor: "white", padding: 20 };
+  const containerStyle = { backgroundColor: "white", padding: 20 }; */
   const [user, setUser] = useRecoilState(userState);
   const resetUserState = useResetRecoilState(userState);
 
-  const [getAllPois, { loading, error }] = useLazyQuery(GET_POI_QUERY);
+  const [getAllPois] = useLazyQuery(GET_POI_QUERY);
   const [pois, setPois] = useState([]);
 
   async function fetchPois() {
@@ -69,7 +69,7 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
     },
   });
 
-  const onSubmit = (formData: {}) => {
+  /* const onSubmit = (formData: {}) => {
     updateUser({
       variables: { data: { ...formData, id: user.userFromDB.id } },
     });
@@ -82,16 +82,16 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
     formState: { errors },
   } = useForm({
     mode: "onBlur",
-    /* resolver: yupResolver(validationSchema), */
-  });
+    resolver: yupResolver(validationSchema),
+  }); */
 
   return (
     <SafeAreaView style={styles.container}>
-      <View className="flex items-end px-10">
+      {/* <View className="flex items-end px-10">
         <Text className="underline font-bold" onPress={showModal}>
           Modifier mes informations
         </Text>
-      </View>
+      </View> */}
       <View className="flex-row items-center justify-between mx-auto my-5 px-5 py-5 bg-white w-[85%] border rounded-xl border-slate-100 shadow-lg shadow-black">
         <View className="flex items-center">
           <AvatarImagePicker />
@@ -159,7 +159,7 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
           </View>
         </ScrollView>
       </View>
-      <Modal
+      {/* <Modal
         visible={visible}
         onDismiss={hideModal}
         contentContainerStyle={containerStyle}
@@ -203,7 +203,7 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
             )}
           />
         </View>
-      </Modal>
+      </Modal> */}
     </SafeAreaView>
   );
 };

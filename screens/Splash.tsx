@@ -1,4 +1,3 @@
-import { Button } from "@react-native-material/core";
 import React from "react";
 import {
   ImageBackground,
@@ -24,23 +23,27 @@ const Splash: React.FC = ({ navigation }: any) => {
           <View style={styles.wrapper}>
             <View style={styles.logo}>
               <Logo width={300} height={60} />
-              <Text className="flex items-center justify-center text-center mt-3 tracking-widest w-52 text-gray-50 text-[24px] font-semibold">Découvrir la ville autrement !</Text>
+              <Text className="flex items-center justify-center text-center mt-3 tracking-widest w-52 text-gray-50 text-[24px] font-semibold">
+                Découvrir la ville autrement !
+              </Text>
             </View>
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate("CityGuideScreen");
-            }}
-            className="absolute bottom-20 w-24 h-24 rounded-full border-l-2 border-r-2  border-t-4 border-[#44bdbe] items-center justify-center"
-          >
-            <Animatable.View
-              animation="pulse"
-              easing="ease-in-out"
-              iterationCount="infinite"
-              className="w-20 h-20 items-center text-center justify-center bg-[#44bdbe] rounded-full"
+            <TouchableOpacity
+              onPress={() => {
+                navigation.navigate("CityGuideScreen");
+              }}
+              className="absolute bottom-20 w-24 h-24 rounded-full border-l-2 border-r-2  border-t-4 border-[#44bdbe] items-center justify-center"
             >
-              <Text className="text-gray-50 text-[30px] font-semibold">GO</Text>
-            </Animatable.View>
-          </TouchableOpacity>
+              <Animatable.View
+                animation="pulse"
+                easing="ease-in-out"
+                iterationCount="infinite"
+                className="w-20 h-20 items-center text-center justify-center bg-[#44bdbe] rounded-full"
+              >
+                <Text className="text-gray-50 text-[30px] font-semibold">
+                  GO
+                </Text>
+              </Animatable.View>
+            </TouchableOpacity>
           </View>
         </ImageBackground>
       </View>

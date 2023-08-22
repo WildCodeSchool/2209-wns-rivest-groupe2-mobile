@@ -10,7 +10,14 @@ interface MenuContainerProps {
   isFiltered: boolean;
 }
 
-const MenuContainer: React.FC<MenuContainerProps> = ({ title, imageSrc, type, setType, setIsFiltered, isFiltered }) => {
+const MenuContainer: React.FC<MenuContainerProps> = ({
+  title,
+  imageSrc,
+  type,
+  setType,
+  setIsFiltered,
+  isFiltered,
+}) => {
   const handlePress = () => {
     if (type === title.toLowerCase()) {
       setIsFiltered(!isFiltered);
@@ -27,10 +34,12 @@ const MenuContainer: React.FC<MenuContainerProps> = ({ title, imageSrc, type, se
     >
       <View
         className={`w-20 h-20 p-2 shadow-sm rounded-full items-center justify-center ${
-          type === title.toLowerCase() && isFiltered === true ? "bg-gray-200" : ""
+          type === title.toLowerCase() && isFiltered === true
+            ? "bg-gray-200"
+            : ""
         }`}
       >
-        <Image source={ imageSrc } className="w-full h-full object-contain" />
+        <Image source={imageSrc} className="w-full h-full object-contain" />
       </View>
       <Text className="text-[#00BBC9] font-semibold">{title}</Text>
     </TouchableOpacity>

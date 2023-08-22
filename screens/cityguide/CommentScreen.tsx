@@ -1,28 +1,42 @@
-import React, { useState, useContext, useEffect, useMemo } from "react";
-import { View, Image, Text, Button, TextInput, Alert, ActivityIndicator } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, { useState, useEffect, useMemo } from "react";
+import {
+  View,
+  Text,
+  Button,
+  TextInput,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
+import { Picker } from "@react-native-picker/picker";
 
 import { rateNumbers } from "../../types/IComment";
-import { useMutation, useQuery } from '@apollo/client';
-import { COMMENT_POI_MUTATION, DELETE_COMMENT, UPDATE_COMMENT_POI_MUTATION } from "../../services/mutations/comment";
+import { useMutation, useQuery } from "@apollo/client";
+import {
+  COMMENT_POI_MUTATION,
+  DELETE_COMMENT,
+  UPDATE_COMMENT_POI_MUTATION,
+} from "../../services/mutations/comment";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../atom/userAtom";
-import { GET_COMMENTS_NUMBER_PER_POI, GET_POI_BY_ID, GET_POI_QUERY, GET_USER_COMMENT_POI_QUERY } from "../../services/queries/Poi";
-import tw from 'tailwind-react-native-classnames';
-
+import {
+  GET_COMMENTS_NUMBER_PER_POI,
+  GET_POI_BY_ID_QUERY,
+  GET_POI_QUERY,
+  GET_USER_COMMENT_POI_QUERY,
+} from "../../services/queries/Poi";
+import tw from "tailwind-react-native-classnames";
 
 const CommentScreen = ({ route }) => {
   const [rating, setRating] = useState<rateNumbers>(rateNumbers.FOUR);
-  const [comment, setComment] = useState('');
+  const [comment, setComment] = useState("");
   const user = useRecoilValue(userState);
   const [isEditing, setIsEditing] = useState(false);
 
   const { poiId } = route.params;
 
-  const { data: poiData, loading: poiLoading } = useQuery(GET_POI_BY_ID, {
+  const { data: poiData, loading: poiLoading } = useQuery(GET_POI_BY_ID_QUERY, {
     variables: { getPoIbyIdId: poiId },
-    }
-  );
+  });
 
   const { loading: userCommentLoading, data: userCommentData } = useQuery(
     GET_USER_COMMENT_POI_QUERY,
@@ -33,16 +47,33 @@ const CommentScreen = ({ route }) => {
 
   const userComment = useMemo(() => {
     if (!poiData) return null;
-    return poiData.getPOIbyId.comments.find(comment => comment.user.id === user.userFromDB.id);
+    return poiData.getPOIbyId.comments.find(
+      (comment) => comment.user.id === user.userFromDB.id
+    );
   }, [poiData, user.userFromDB.id]);
 
   const otherComments = useMemo(() => {
     if (!poiData) return [];
-    return poiData.getPOIbyId.comments.filter(comment => comment.user.id !== user.userFromDB.id);
+    return poiData.getPOIbyId.comments.filter(
+      (comment) => comment.user.id !== user.userFromDB.id
+    );
   }, [poiData, user.userFromDB.id]);
 
   const [deleteComment] = useMutation(DELETE_COMMENT);
-  const [commentPOI] = useMutation(COMMENT_POI_MUTATION,
+  const [commentPOI] = useMutation(COMMENT_POI_MUTATION, {
+    context: {
+      headers: {
+        authorization: `Bearer ${user.token}`,
+      },
+    },
+    refetchQueries: [
+      { query: GET_POI_QUERY },
+      { query: GET_COMMENTS_NUMBER_PER_POI, variables: { poiId } },
+    ],
+  });
+
+  const [updateComment, { loading: updateLoading }] = useMutation(
+    UPDATE_COMMENT_POI_MUTATION,
     {
       context: {
         headers: {
@@ -53,36 +84,25 @@ const CommentScreen = ({ route }) => {
         { query: GET_POI_QUERY },
         { query: GET_COMMENTS_NUMBER_PER_POI, variables: { poiId } },
       ],
-    });
+    }
+  );
 
-    const [updateComment, { loading: updateLoading }] = useMutation(UPDATE_COMMENT_POI_MUTATION, {
-      context: {
-        headers: {
-          authorization: `Bearer ${user.token}`,
+  const handleUpdateComment = async () => {
+    try {
+      await updateComment({
+        variables: {
+          commentId: userComment.id,
+          comment: comment,
+          rate: rating,
+          userId: user.userFromDB.id,
+          poiId: poiId,
         },
-      },
-      refetchQueries: [
-        { query: GET_POI_QUERY },
-        { query: GET_COMMENTS_NUMBER_PER_POI, variables: { poiId } },
-      ],
-    });
-
-    const handleUpdateComment = async () => {
-      try {
-        await updateComment({
-          variables: {
-            commentId: userComment.id, 
-            comment: comment,
-            rate: rating,
-            userId: user.userFromDB.id,
-            poiId: poiId,
-          }
-        });
-        setIsEditing(false);
-      } catch (error) {
-        Alert.alert(`Failed to update comment: ${error.message}`);
-      }
-    };
+      });
+      setIsEditing(false);
+    } catch (error) {
+      Alert.alert(`Failed to update comment: ${error.message}`);
+    }
+  };
 
   const handleDeleteComment = async () => {
     try {
@@ -94,14 +114,13 @@ const CommentScreen = ({ route }) => {
 
   const handleAddComment = async () => {
     try {
-
       await commentPOI({
         variables: {
           poiId: poiId,
           userId: user.userFromDB.id,
           comment: comment,
-          rate: rating
-        }
+          rate: rating,
+        },
       });
     } catch (error) {
       Alert.alert(`Failed to add comment: ${error.message}`);
@@ -109,7 +128,7 @@ const CommentScreen = ({ route }) => {
   };
 
   useEffect(() => {
-    if(userCommentData) {
+    if (userCommentData) {
       setComment(userCommentData.comment);
       setRating(userCommentData.rating);
     }
@@ -120,15 +139,12 @@ const CommentScreen = ({ route }) => {
   }
 
   const renderStars = (rating) => {
-    let stars = '';
+    let stars = "";
     for (let i = 0; i < rating; i++) {
-      stars += '⭐';
+      stars += "⭐";
     }
     return stars;
   };
-
-
-  
 
   return (
     <View style={tw`p-4 mt-4`}>
@@ -137,12 +153,12 @@ const CommentScreen = ({ route }) => {
           <Text style={tw`text-lg font-bold mb-2`}>Ton commentaire :</Text>
           {isEditing ? (
             <>
-              <TextInput 
+              <TextInput
                 style={tw`border border-gray-500 rounded p-2 mb-2`}
-                multiline 
-                numberOfLines={2} 
-                onChangeText={text => setComment(text)} 
-                value={comment} 
+                multiline
+                numberOfLines={2}
+                onChangeText={(text) => setComment(text)}
+                value={comment}
               />
               <Text style={tw`text-lg font-bold mb-2`}>Ta note</Text>
               <Picker
@@ -168,11 +184,14 @@ const CommentScreen = ({ route }) => {
               <Text>{renderStars(userComment.rate)}</Text>
               <Text style={tw`text-base mb-2`}>{userComment.text}</Text>
               <View style={tw`mt-2`}>
-              <Button title="Modifier" onPress={() => {
-                setIsEditing(true);
-                setComment(userComment.text);
-                setRating(userComment.rate);
-              }} />              
+                <Button
+                  title="Modifier"
+                  onPress={() => {
+                    setIsEditing(true);
+                    setComment(userComment.text);
+                    setRating(userComment.rate);
+                  }}
+                />
               </View>
             </>
           )}
@@ -191,38 +210,40 @@ const CommentScreen = ({ route }) => {
             <Picker.Item label="4" value={rateNumbers.FOUR} />
             <Picker.Item label="5" value={rateNumbers.FIVE} />
           </Picker>
-  
+
           <Text style={tw`text-lg font-bold mb-2`}>Ecris un commentaire :</Text>
-          <TextInput 
+          <TextInput
             style={tw`border border-gray-500 rounded p-2 mb-2`}
-            multiline 
-            numberOfLines={4} 
-            onChangeText={text => setComment(text)} 
-            value={comment} 
+            multiline
+            numberOfLines={4}
+            onChangeText={(text) => setComment(text)}
+            value={comment}
           />
-  
+
           {/* Button to submit the rating/comment */}
           <View style={tw`mt-2`}>
             <Button title="Submit Comment" onPress={handleAddComment} />
           </View>
-  
+
           {/* Button to delete the comment */}
           <View style={tw`mt-2`}>
             <Button title="Delete Comment" onPress={handleDeleteComment} />
           </View>
-         </>
-        )}
-        <Text style={tw`text-lg font-bold mb-2 mt-4`}>Commentaires :</Text>
-        {otherComments.map(comment => (
-          <View key={comment.id} style={tw`border-b border-gray-300 p-2`}>
-            <View>
-              <Text style={tw`font-bold mb-1`}>{comment.user.username} {renderStars(comment.rate)}</Text>
-              <Text style={tw`text-base`}>{comment.text}</Text>
-            </View>
+        </>
+      )}
+      <Text style={tw`text-lg font-bold mb-2 mt-4`}>Commentaires :</Text>
+      {otherComments.map((comment) => (
+        <View key={comment.id} style={tw`border-b border-gray-300 p-2`}>
+          <View>
+            <Text style={tw`font-bold mb-1`}>
+              {comment.user.username} {renderStars(comment.rate)}
+            </Text>
+            <Text style={tw`text-base`}>{comment.text}</Text>
           </View>
-        ))}
-      </View>
+        </View>
+      ))}
+    </View>
   );
-        }
+};
 
 export default CommentScreen;

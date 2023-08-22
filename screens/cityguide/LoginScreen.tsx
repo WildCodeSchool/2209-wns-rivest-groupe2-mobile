@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import React, { useLayoutEffect, useState } from "react";
-import { gql, useLazyQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { Controller, SubmitHandler, useForm } from "react-hook-form";
 import InputGroup from "../../components/InputGroup";
 import Button from "../../components/Button";
@@ -20,27 +20,7 @@ import { userState } from "../../atom/userAtom";
 import * as SecureStore from "expo-secure-store";
 import { ROUTES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
-
-export const GET_TOKEN = gql`
-  query Query($password: String!, $email: String!) {
-    getToken(password: $password, email: $email) {
-      token
-      userFromDB {
-        id
-        email
-        username
-        firstname
-        lastname
-        profilePicture
-        isVerified
-        role {
-          id
-          name
-        }
-      }
-    }
-  }
-`;
+import { GET_TOKEN } from "../../services/queries/UserQueries";
 
 export async function saveTokenInSecureStore(key: string, value: string) {
   await SecureStore.setItemAsync(key, value);
@@ -103,12 +83,7 @@ const LoginScreen = ({ navigation }) => {
     });
   };
 
-  const {
-    control,
-    handleSubmit,
-    clearErrors,
-    formState: { errors },
-  } = useForm<IUserForm>({
+  const { control, handleSubmit } = useForm<IUserForm>({
     mode: "onBlur",
     resolver: yupResolver(validationSchema),
   });
@@ -181,19 +156,6 @@ const LoginScreen = ({ navigation }) => {
                 <View>
                   <Button onPress={handleSubmit(onSubmit)}>SE CONNECTER</Button>
                 </View>
-
-                {/***************** FORGOT PASSWORD BUTTON *****************/}
-                <TouchableOpacity
-                  onPress={() =>
-                    navigation.navigate(ROUTES.FORGOT_PASSWORD, {
-                      userId: "X0001",
-                    })
-                  }
-                >
-                  <Text style={styles.forgotPassText}>
-                    Mot de passe oublié ?
-                  </Text>
-                </TouchableOpacity>
               </View>
 
               {/******************** FOOTER *********************/}

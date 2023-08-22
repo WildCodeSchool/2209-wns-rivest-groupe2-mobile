@@ -17,13 +17,11 @@ const ItemCardContainer: React.FC<ItemCardContainerProps> = ({
   name,
   pictureUrl,
   address,
-  postal,
   isFavorite,
 }) => {
   const navigation = useNavigation();
 
-  const defaultImage = 'https://via.placeholder.com/150';
-
+  const defaultImage = "https://via.placeholder.com/150";
 
   return (
     <TouchableOpacity
@@ -37,8 +35,12 @@ const ItemCardContainer: React.FC<ItemCardContainerProps> = ({
         </View>
       ) : null}
       <Image
-      source={{ uri: Array.isArray(pictureUrl) ? defaultImage : pictureUrl || defaultImage }}
-      className="w-full h-36 rounded-md object-cover"
+        source={{
+          uri: Array.isArray(pictureUrl)
+            ? defaultImage
+            : pictureUrl || defaultImage,
+        }}
+        className="w-full h-36 rounded-md object-cover"
       />
       <Text className="text-[#44bdbe] text-[16px] font-bold">
         {name?.length > 14 ? `${name.slice(0, 14)}..` : name}

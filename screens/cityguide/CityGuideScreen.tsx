@@ -1,5 +1,5 @@
 import React from "react";
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator } from "@react-navigation/stack";
 import MapScreen from "./MapScreen";
 import TabNavigator from "../../navigation/TabNavigator";
 
@@ -13,10 +13,7 @@ const CityGuideScreen: React.FC = () => {
         component={TabNavigator}
         options={{ headerShown: false }}
       />
-      <Stack.Screen
-        name="Map"
-        component={MapScreen}
-      />
+      <Stack.Screen name="Map" component={MapScreen} />
     </Stack.Navigator>
   );
 };
