@@ -66,18 +66,6 @@ export const GET_POI_QUERY = gql`
         hoursOpen
         hoursClose
       }
-      comments {
-        id
-        createDate
-        updateDate
-        text
-        rate
-        user {
-          id
-          email
-          username
-        }
-      }
     }
   }
 `;
@@ -107,6 +95,18 @@ export const GET_POI_BY_ID_QUERY = gql`
         id
         name
         coordinates
+      }
+      comments {
+        id
+        createDate
+        updateDate
+        text
+        rate
+        user {
+          id
+          email
+          username
+        }
       }
     }
   }

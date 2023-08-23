@@ -1,9 +1,15 @@
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ImageSourcePropType,
+} from "react-native";
 import React, { Dispatch, SetStateAction } from "react";
 
 interface MenuContainerProps {
   title: string;
-  imageSrc: string;
+  imageSrc: ImageSourcePropType;
   type: string;
   setType: Dispatch<SetStateAction<string>>;
   setIsFiltered: Dispatch<SetStateAction<boolean>>;
@@ -29,13 +35,13 @@ const MenuContainer: React.FC<MenuContainerProps> = ({
 
   return (
     <TouchableOpacity
-      className="items-center justify-center space-y-2 "
+      className="items-center justify-center space-y-2"
       onPress={handlePress}
     >
       <View
         className={`w-20 h-20 p-2 shadow-sm rounded-full items-center justify-center ${
           type === title.toLowerCase() && isFiltered === true
-            ? "bg-gray-200"
+            ? "bg-gray-400"
             : ""
         }`}
       >

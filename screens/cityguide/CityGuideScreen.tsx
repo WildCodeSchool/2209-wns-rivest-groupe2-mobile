@@ -13,7 +13,6 @@ const CityGuideScreen: React.FC = () => {
         component={TabNavigator}
         options={{ headerShown: false }}
       />
-      <Stack.Screen name="Map" component={MapScreen} />
     </Stack.Navigator>
   );
 };

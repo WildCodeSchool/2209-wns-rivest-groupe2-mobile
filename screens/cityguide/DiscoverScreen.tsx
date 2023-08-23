@@ -1,14 +1,35 @@
 import { View, Text, SafeAreaView, ScrollView } from "react-native";
-import React, { useCallback, useLayoutEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useState,
+} from "react";
 import MenuContainer from "../../components/MenuContainer";
-import { Hotels, Restaurants, Musee } from "../../assets/images";
+import {
+  Bars,
+  Hotels,
+  Restaurants,
+  Musee,
+  Church,
+  Fastfood,
+} from "../../assets/images";
 import { useLazyQuery } from "@apollo/client";
 import { useFocusEffect } from "@react-navigation/native";
 import ItemCardContainer from "../../components/ItemCardContainer";
 import { IPOIData } from "../../types/IPoiData";
-import { GET_POI_QUERY } from "../../services/queries/Poi";
+import { GET_POI_QUERY_BY_CITY } from "../../services/queries/Poi";
+import { CityContext } from "../../context/CityContext";
+import { GET_ALL_CITIES } from "../../services/queries/CityQueries";
+import Dropdown from "../../components/Dropdown";
 
 const DiscoverScreen = ({ navigation }) => {
+  const [pois, setPois] = useState<IPOIData[] | []>([]);
+  const [cities, setCities] = useState([]);
+  const [type, setType] = useState<string>("");
+  const [isFiltered, setIsFiltered] = useState<boolean>(false);
+  const { city, setCity } = useContext(CityContext);
+
   //DISABLE TOP NAVIGATION
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -17,33 +38,44 @@ const DiscoverScreen = ({ navigation }) => {
   }, []);
 
   //FETCH DATA
-  const [getAllPois, { loading, error }] = useLazyQuery(GET_POI_QUERY);
-  const [pois, setPois] = useState<IPOIData[] | []>([]);
+  const [getAllPoiInCity, { loading, error }] = useLazyQuery(
+    GET_POI_QUERY_BY_CITY,
+    { variables: { cityId: city.id } }
+  );
+  const [getCitiesData] = useLazyQuery(GET_ALL_CITIES);
 
   useFocusEffect(
     useCallback(() => {
       async function fetchPois() {
         try {
-          const data = await getAllPois();
-          console.log("data", data);
-          const dataPois = [...data.data.getAllPoi] as IPOIData[];
+          const data = await getAllPoiInCity();
+          const citiesData = await getCitiesData();
+
+          const dataPois = [...data.data.getAllPoiInCity] as IPOIData[];
+          const dataCities = [...citiesData.data.getAllCities];
+
           setPois(dataPois);
+          setCities(dataCities);
         } catch (error) {
           console.log(error);
           setPois([]);
         }
       }
       fetchPois();
-    }, [])
+    }, [city])
   );
-
-  //FILTER DATA
-  const [type, setType] = useState<string>("");
-  const [isFiltered, setIsFiltered] = useState<boolean>(false);
 
   return (
     <SafeAreaView>
       <View className="flex-row items-center justify-between mt-10 px-5">
+        <View className="w-12 h-12 bg-gray-200 rounded-3xl items-center justify-center shadow-lg">
+          <Dropdown
+            label={city.name.charAt(0)}
+            data={cities}
+            onSelect={setCity}
+            isDiscoverScreen={true}
+          />
+        </View>
         <View>
           <Text className="text-[35px] text-[#44bdbe] font-semibold">
             Décrouvrez
@@ -52,10 +84,9 @@ const DiscoverScreen = ({ navigation }) => {
             nos adresses exclusives
           </Text>
         </View>
-        <View className="w-12 h-12 bg-gray-400 rounded-md items-center justify-center shadow-lg"></View>
       </View>
       <ScrollView>
-        <View className="flex-row items-center justify-between px-8 mt-8">
+        <View className="flex-row flex-wrap items-center justify-center px-8 mt-8">
           <MenuContainer
             key={"hotel"}
             title="Hotel"
@@ -83,6 +114,33 @@ const DiscoverScreen = ({ navigation }) => {
             setIsFiltered={setIsFiltered}
             isFiltered={isFiltered}
           />
+          <MenuContainer
+            key={"bar"}
+            title="Bar"
+            imageSrc={Bars}
+            type={type}
+            setType={setType}
+            setIsFiltered={setIsFiltered}
+            isFiltered={isFiltered}
+          />
+          <MenuContainer
+            key={"fastfood"}
+            title="Fast-food"
+            imageSrc={Fastfood}
+            type={type}
+            setType={setType}
+            setIsFiltered={setIsFiltered}
+            isFiltered={isFiltered}
+          />
+          <MenuContainer
+            key={"church"}
+            title="Lieu de culte"
+            imageSrc={Church}
+            type={type}
+            setType={setType}
+            setIsFiltered={setIsFiltered}
+            isFiltered={isFiltered}
+          />
         </View>
 
         {/* Cards container */}
@@ -98,7 +156,7 @@ const DiscoverScreen = ({ navigation }) => {
                         id={poi?.id}
                         pictureUrl={
                           poi?.pictureUrl
-                            ? poi?.pictureUrl
+                            ? poi?.pictureUrl[0]
                             : "https://cdn.pixabay.com/photo/2015/10/30/12/22/eat-1014025_1280.jpg"
                         }
                         name={poi?.name}

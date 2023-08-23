@@ -6,6 +6,8 @@ import {
   TextInput,
   Alert,
   ActivityIndicator,
+  StyleSheet,
+  ScrollView,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 
@@ -25,14 +27,18 @@ import {
   GET_USER_COMMENT_POI_QUERY,
 } from "../../services/queries/Poi";
 import tw from "tailwind-react-native-classnames";
+import Icon from "react-native-vector-icons/FontAwesome";
+import AntIcon from "react-native-vector-icons/AntDesign";
 
-const CommentScreen = ({ route }) => {
+const CommentScreen = ({ route, navigation }) => {
   const [rating, setRating] = useState<rateNumbers>(rateNumbers.FOUR);
   const [comment, setComment] = useState("");
   const user = useRecoilValue(userState);
   const [isEditing, setIsEditing] = useState(false);
 
   const { poiId } = route.params;
+
+  console.log("poiId", poiId);
 
   const { data: poiData, loading: poiLoading } = useQuery(GET_POI_BY_ID_QUERY, {
     variables: { getPoIbyIdId: poiId },
@@ -45,9 +51,11 @@ const CommentScreen = ({ route }) => {
     }
   );
 
+  console.log("poiData", poiData);
+
   const userComment = useMemo(() => {
     if (!poiData) return null;
-    return poiData.getPOIbyId.comments.find(
+    return poiData.getPOIbyId.comments.filter(
       (comment) => comment.user.id === user.userFromDB.id
     );
   }, [poiData, user.userFromDB.id]);
@@ -67,7 +75,7 @@ const CommentScreen = ({ route }) => {
       },
     },
     refetchQueries: [
-      { query: GET_POI_QUERY },
+      { query: GET_POI_BY_ID_QUERY, variables: { poiId } },
       { query: GET_COMMENTS_NUMBER_PER_POI, variables: { poiId } },
     ],
   });
@@ -81,11 +89,32 @@ const CommentScreen = ({ route }) => {
         },
       },
       refetchQueries: [
-        { query: GET_POI_QUERY },
+        { query: GET_POI_BY_ID_QUERY, variables: { poiId } },
         { query: GET_COMMENTS_NUMBER_PER_POI, variables: { poiId } },
       ],
     }
   );
+
+  console.log("token", user.token);
+
+  const handleAddComment = async () => {
+    try {
+      await commentPOI({
+        variables: {
+          poiId: poiId,
+          userId: user.userFromDB.id,
+          comment: comment,
+          rate: rating,
+        },
+      });
+      Alert.alert("Commentaire créé avec succès");
+      navigation.navigate("ItemScreen", { param: poiId });
+      setComment(undefined);
+      setRating(rateNumbers.FOUR);
+    } catch (error) {
+      Alert.alert(`Erreur lors de l'ajout du commentaire: ${error.message}`);
+    }
+  };
 
   const handleUpdateComment = async () => {
     try {
@@ -112,20 +141,16 @@ const CommentScreen = ({ route }) => {
     }
   };
 
-  const handleAddComment = async () => {
-    try {
-      await commentPOI({
-        variables: {
-          poiId: poiId,
-          userId: user.userFromDB.id,
-          comment: comment,
-          rate: rating,
-        },
-      });
-    } catch (error) {
-      Alert.alert(`Failed to add comment: ${error.message}`);
-    }
-  };
+  console.log(
+    "poiId",
+    poiId,
+    "userId",
+    user.userFromDB.id,
+    "comment",
+    comment,
+    "rate",
+    rating
+  );
 
   useEffect(() => {
     if (userCommentData) {
@@ -138,112 +163,120 @@ const CommentScreen = ({ route }) => {
     return <ActivityIndicator />;
   }
 
-  const renderStars = (rating) => {
-    let stars = "";
-    for (let i = 0; i < rating; i++) {
-      stars += "⭐";
-    }
-    return stars;
+  const renderStars = (rating: number) => {
+    const totalStars = 5;
+    const goldenStars = Array.from({ length: rating }).map((_, i) => {
+      return <Icon name="star" size={15} color="gold" key={i} />;
+    });
+    const greyStars = Array.from({ length: totalStars - rating }).map(
+      (_, i) => {
+        return <Icon name="star" size={15} color="grey" key={i + rating} />;
+      }
+    );
+    return (
+      <View style={styles.stars}>
+        {goldenStars}
+        {greyStars}
+      </View>
+    );
   };
 
+  console.log("userComment", userComment);
+
   return (
-    <View style={tw`p-4 mt-4`}>
-      {userComment ? (
-        <>
-          <Text style={tw`text-lg font-bold mb-2`}>Ton commentaire :</Text>
-          {isEditing ? (
-            <>
-              <TextInput
-                style={tw`border border-gray-500 rounded p-2 mb-2`}
-                multiline
-                numberOfLines={2}
-                onChangeText={(text) => setComment(text)}
-                value={comment}
-              />
-              <Text style={tw`text-lg font-bold mb-2`}>Ta note</Text>
-              <Picker
-                selectedValue={rating}
-                onValueChange={(itemValue, itemIndex) => setRating(itemValue)}
-                style={tw`mb-2`}
-              >
-                <Picker.Item label="1" value={rateNumbers.ONE} />
-                <Picker.Item label="2" value={rateNumbers.TWO} />
-                <Picker.Item label="3" value={rateNumbers.THREE} />
-                <Picker.Item label="4" value={rateNumbers.FOUR} />
-                <Picker.Item label="5" value={rateNumbers.FIVE} />
-              </Picker>
-              <View style={tw`mt-2`}>
-                <Button title="Sauvegarder" onPress={handleUpdateComment} />
-              </View>
-              <View style={tw`mt-2`}>
-                <Button title="Annuler" onPress={() => setIsEditing(false)} />
-              </View>
-            </>
-          ) : (
-            <>
-              <Text>{renderStars(userComment.rate)}</Text>
-              <Text style={tw`text-base mb-2`}>{userComment.text}</Text>
-              <View style={tw`mt-2`}>
-                <Button
-                  title="Modifier"
+    <ScrollView style={tw`p-4 mt-4`}>
+      <Text style={tw`text-lg font-bold mt-5 mb-2`}>Tes commentaires :</Text>
+      {userComment &&
+        userComment.length > 0 &&
+        userComment.map((comment) => (
+          <View key={comment.id}>
+            {renderStars(comment.rate)}
+            <Text style={tw`text-base mb-2`}>{comment.text}</Text>
+            <View style={styles.buttonsContainer}>
+              <View style={styles.button}>
+                <Icon.Button
+                  name="edit"
+                  borderRadius={500}
+                  size={20}
+                  iconStyle={{ margin: 2, paddingLeft: 8, paddingVertical: 5 }}
+                  backgroundColor="#C5C5C5"
                   onPress={() => {
                     setIsEditing(true);
-                    setComment(userComment.text);
-                    setRating(userComment.rate);
+                    setComment(comment.text);
+                    setRating(comment.rate);
                   }}
                 />
               </View>
-            </>
-          )}
-        </>
-      ) : (
-        <>
-          <Text style={tw`text-lg font-bold mb-2`}>Donner une note:</Text>
-          <Picker
-            selectedValue={rating}
-            onValueChange={(itemValue, itemIndex) => setRating(itemValue)}
-            style={tw`mb-2`}
-          >
-            <Picker.Item label="1" value={rateNumbers.ONE} />
-            <Picker.Item label="2" value={rateNumbers.TWO} />
-            <Picker.Item label="3" value={rateNumbers.THREE} />
-            <Picker.Item label="4" value={rateNumbers.FOUR} />
-            <Picker.Item label="5" value={rateNumbers.FIVE} />
-          </Picker>
-
-          <Text style={tw`text-lg font-bold mb-2`}>Ecris un commentaire :</Text>
-          <TextInput
-            style={tw`border border-gray-500 rounded p-2 mb-2`}
-            multiline
-            numberOfLines={4}
-            onChangeText={(text) => setComment(text)}
-            value={comment}
-          />
-
-          {/* Button to submit the rating/comment */}
-          <View style={tw`mt-2`}>
-            <Button title="Submit Comment" onPress={handleAddComment} />
+              <View style={styles.button}>
+                <AntIcon.Button
+                  borderRadius={500}
+                  size={20}
+                  iconStyle={{ margin: 2, paddingLeft: 8, paddingVertical: 5 }}
+                  name="delete"
+                  backgroundColor="#C5C5C5"
+                  onPress={() => {
+                    setIsEditing(true);
+                    setComment(comment.text);
+                    setRating(comment.rate);
+                  }}
+                />
+              </View>
+            </View>
           </View>
-
-          {/* Button to delete the comment */}
-          <View style={tw`mt-2`}>
-            <Button title="Delete Comment" onPress={handleDeleteComment} />
+        ))}
+      <View>
+        <Text>Evaluez ce {poiData.getPOIbyId.type}</Text>
+        <Text>Partagez votre avis avec les autres utilisateurs</Text>
+        <Button
+          title="Ajouter un commentaire"
+          onPress={() => setIsEditing(true)}
+        />
+      </View>
+      <View>
+        <Text style={tw`text-lg font-bold mb-2 mt-4`}>
+          Commentaires utilisateurs :
+        </Text>
+        {otherComments.length > 0 ? (
+          otherComments.map((comment) => (
+            <View key={comment.id} style={tw`border-b border-gray-300 p-2`}>
+              <View>
+                {renderStars(comment.rate)}
+                <Text style={tw`font-bold mb-1`}>{comment.user.username}</Text>
+                <Text style={tw`text-base mb-2`}>{comment.text}</Text>
+              </View>
+            </View>
+          ))
+        ) : (
+          <View style={tw`p-2`}>
+            <Text>Aucun commentaire renseigné actuellement</Text>
           </View>
-        </>
-      )}
-      <Text style={tw`text-lg font-bold mb-2 mt-4`}>Commentaires :</Text>
-      {otherComments.map((comment) => (
-        <View key={comment.id} style={tw`border-b border-gray-300 p-2`}>
-          <View>
-            <Text style={tw`font-bold mb-1`}>
-              {comment.user.username} {renderStars(comment.rate)}
-            </Text>
-            <Text style={tw`text-base`}>{comment.text}</Text>
-          </View>
-        </View>
-      ))}
-    </View>
+        )}
+      </View>
+    </ScrollView>
   );
 };
 
 export default CommentScreen;
+
+const styles = StyleSheet.create({
+  stars: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    marginTop: 5,
+    marginBottom: 5,
+  },
+  buttonsContainer: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    alignItems: "center",
+    marginTop: 16,
+  },
+  button: {
+    marginHorizontal: 8,
+    alignSelf: "center",
+    textAlign: "center",
+  },
+});

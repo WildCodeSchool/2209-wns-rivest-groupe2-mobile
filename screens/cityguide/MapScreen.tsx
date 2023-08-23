@@ -1,4 +1,9 @@
-import React, { useCallback, useLayoutEffect, useState } from "react";
+import React, {
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  useState,
+} from "react";
 import { StyleSheet, Text, SafeAreaView, View } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { useLazyQuery } from "@apollo/client";
@@ -6,19 +11,13 @@ import { useFocusEffect } from "@react-navigation/native";
 import { GET_POI_QUERY_BY_CITY } from "../../services/queries/Poi";
 import { GET_ALL_CITIES } from "../../services/queries/CityQueries";
 import Dropdown from "../../components/Dropdown";
+import { CityContext } from "../../context/CityContext";
 
 const MapScreen = ({ navigation }) => {
   const [pois, setPois] = useState([]);
   const [cities, setCities] = useState([]);
-  const [city, setCity] = useState<{
-    name: string;
-    id: number;
-    coordinates: number[];
-  }>({
-    name: "Paris",
-    id: 1,
-    coordinates: [48.860161, 2.350041],
-  });
+  const { city, setCity } = useContext(CityContext);
+
   const [getAllPoiInCity, { loading, error }] = useLazyQuery(
     GET_POI_QUERY_BY_CITY,
     { variables: { cityId: city.id } }
@@ -87,7 +86,7 @@ const MapScreen = ({ navigation }) => {
       </MapView>
       {cities && (
         <View style={{ width: "100%", position: "absolute", top: 50 }}>
-          <Dropdown label="Villes" data={cities} onSelect={setCity} />
+          <Dropdown label={city.name} data={cities} onSelect={setCity} />
         </View>
       )}
     </SafeAreaView>

@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
+import Constants from "expo-constants";
 
 interface ItemCardContainerProps {
   id: number;
@@ -20,8 +21,10 @@ const ItemCardContainer: React.FC<ItemCardContainerProps> = ({
   isFavorite,
 }) => {
   const navigation = useNavigation();
-
-  const defaultImage = "https://via.placeholder.com/150";
+  const { manifest } = Constants;
+  const image_url =
+    manifest?.debuggerHost &&
+    `http://${manifest.debuggerHost.split(":").shift()}:18000/images`;
 
   return (
     <TouchableOpacity
@@ -36,9 +39,10 @@ const ItemCardContainer: React.FC<ItemCardContainerProps> = ({
       ) : null}
       <Image
         source={{
-          uri: Array.isArray(pictureUrl)
-            ? defaultImage
-            : pictureUrl || defaultImage,
+          uri:
+            pictureUrl && Array.isArray(pictureUrl) && pictureUrl.length > 0
+              ? `${image_url}${pictureUrl[0]}`
+              : pictureUrl,
         }}
         className="w-full h-36 rounded-md object-cover"
       />

@@ -9,6 +9,7 @@ import Navigator from "./navigation/Navigator";
 import { RecoilRoot } from "recoil";
 import { Provider as PaperProvider } from "react-native-paper";
 import { RootSiblingParent } from "react-native-root-siblings";
+import { CityContextProvider } from "./context/CityContext";
 import * as SecureStore from "expo-secure-store";
 import Constants from "expo-constants";
 
@@ -45,13 +46,15 @@ export default function App() {
 
   return (
     <ApolloProvider client={client}>
-      <RootSiblingParent>
-        <RecoilRoot>
-          <PaperProvider>
-            <Navigator />
-          </PaperProvider>
-        </RecoilRoot>
-      </RootSiblingParent>
+      <CityContextProvider>
+        <RootSiblingParent>
+          <RecoilRoot>
+            <PaperProvider>
+              <Navigator />
+            </PaperProvider>
+          </RecoilRoot>
+        </RootSiblingParent>
+      </CityContextProvider>
     </ApolloProvider>
   );
 }
