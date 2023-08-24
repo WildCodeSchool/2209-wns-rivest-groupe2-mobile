@@ -21,8 +21,6 @@ const { width } = Dimensions.get("window");
 const Dropdown: FC<Props> = ({ label, data, onSelect, isDiscoverScreen }) => {
   const sortedData = data.sort((a, b) => a.name.localeCompare(b.name));
 
-  console.log("sortedData", sortedData);
-
   return (
     <View
       style={isDiscoverScreen ? styles.discoverContainer : styles.viewContainer}

@@ -4,7 +4,13 @@ import React, {
   useLayoutEffect,
   useState,
 } from "react";
-import { StyleSheet, Text, SafeAreaView, View } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  SafeAreaView,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import { useLazyQuery } from "@apollo/client";
 import { useFocusEffect } from "@react-navigation/native";
@@ -18,11 +24,10 @@ const MapScreen = ({ navigation }) => {
   const [cities, setCities] = useState([]);
   const { city, setCity } = useContext(CityContext);
 
-  const [getAllPoiInCity, { loading, error }] = useLazyQuery(
-    GET_POI_QUERY_BY_CITY,
-    { variables: { cityId: city.id } }
-  );
-  const [getCitiesData] = useLazyQuery(GET_ALL_CITIES);
+  const [getAllPoiInCity, { loading: poiLoading, error: poiError }] =
+    useLazyQuery(GET_POI_QUERY_BY_CITY, { variables: { cityId: city.id } });
+  const [getCitiesData, { loading: cityLoading, error: cityError }] =
+    useLazyQuery(GET_ALL_CITIES);
 
   const position = {
     latitude: city.coordinates[0],
@@ -59,12 +64,28 @@ const MapScreen = ({ navigation }) => {
     }, [city])
   );
 
-  if (loading) {
-    return <Text>Loading</Text>;
+  if (poiLoading || cityLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
-  if (error) {
-    return <Text>{error.message}</Text>;
+  if (poiError) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text>{poiError.message}</Text>
+      </View>
+    );
+  }
+
+  if (cityError) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text>{cityError.message}</Text>
+      </View>
+    );
   }
 
   return (
@@ -96,6 +117,16 @@ const MapScreen = ({ navigation }) => {
 export default MapScreen;
 
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   container: {
     position: "relative",
     flex: 1,

@@ -1,7 +1,15 @@
-import { View, Text, SafeAreaView, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  SafeAreaView,
+  ScrollView,
+  ActivityIndicator,
+  StyleSheet,
+} from "react-native";
 import React, {
   useCallback,
   useContext,
+  useEffect,
   useLayoutEffect,
   useState,
 } from "react";
@@ -22,6 +30,9 @@ import { GET_POI_QUERY_BY_CITY } from "../../services/queries/Poi";
 import { CityContext } from "../../context/CityContext";
 import { GET_ALL_CITIES } from "../../services/queries/CityQueries";
 import Dropdown from "../../components/Dropdown";
+import { useRecoilState } from "recoil";
+import { userState } from "../../atom/userAtom";
+import * as SecureStore from "expo-secure-store";
 
 const DiscoverScreen = ({ navigation }) => {
   const [pois, setPois] = useState<IPOIData[] | []>([]);
@@ -29,6 +40,25 @@ const DiscoverScreen = ({ navigation }) => {
   const [type, setType] = useState<string>("");
   const [isFiltered, setIsFiltered] = useState<boolean>(false);
   const { city, setCity } = useContext(CityContext);
+  const [user, setUser] = useRecoilState(userState);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      let user;
+      try {
+        user = await SecureStore.getItemAsync("user");
+      } catch (err) {
+        console.error(err);
+      }
+      if (user) {
+        setUser(JSON.parse(user));
+        setLoading(false);
+      }
+      setLoading(false);
+    })();
+  }, []);
 
   //DISABLE TOP NAVIGATION
   useLayoutEffect(() => {
@@ -38,11 +68,10 @@ const DiscoverScreen = ({ navigation }) => {
   }, []);
 
   //FETCH DATA
-  const [getAllPoiInCity, { loading, error }] = useLazyQuery(
-    GET_POI_QUERY_BY_CITY,
-    { variables: { cityId: city.id } }
-  );
-  const [getCitiesData] = useLazyQuery(GET_ALL_CITIES);
+  const [getAllPoiInCity, { loading: poiLoading, error: poiError }] =
+    useLazyQuery(GET_POI_QUERY_BY_CITY, { variables: { cityId: city.id } });
+  const [getCitiesData, { loading: cityLoading, error: cityError }] =
+    useLazyQuery(GET_ALL_CITIES);
 
   useFocusEffect(
     useCallback(() => {
@@ -54,7 +83,7 @@ const DiscoverScreen = ({ navigation }) => {
           const dataPois = [...data.data.getAllPoiInCity] as IPOIData[];
           const dataCities = [...citiesData.data.getAllCities];
 
-          setPois(dataPois);
+          setPois(dataPois.sort((a, b) => a.type.localeCompare(b.type)));
           setCities(dataCities);
         } catch (error) {
           console.log(error);
@@ -64,6 +93,30 @@ const DiscoverScreen = ({ navigation }) => {
       fetchPois();
     }, [city])
   );
+
+  if (poiLoading || cityLoading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
+  }
+
+  if (poiError) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text>{poiError.message}</Text>
+      </View>
+    );
+  }
+
+  if (cityError) {
+    return (
+      <View style={styles.errorContainer}>
+        <Text>{cityError.message}</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaView>
@@ -195,3 +248,16 @@ const DiscoverScreen = ({ navigation }) => {
 };
 
 export default DiscoverScreen;
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  errorContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});

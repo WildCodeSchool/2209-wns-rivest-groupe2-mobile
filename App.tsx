@@ -12,6 +12,7 @@ import { RootSiblingParent } from "react-native-root-siblings";
 import { CityContextProvider } from "./context/CityContext";
 import * as SecureStore from "expo-secure-store";
 import Constants from "expo-constants";
+import React from "react";
 
 async function getValueFor(key: string): Promise<string | null> {
   let result = await SecureStore.getItemAsync(key);

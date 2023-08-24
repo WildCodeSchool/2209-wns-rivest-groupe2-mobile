@@ -12,7 +12,7 @@ import { useFocusEffect } from "@react-navigation/native";
 import ItemCardContainer from "../../components/ItemCardContainer";
 import { ScrollView } from "react-native-gesture-handler";
 import { UPDATE_USER_MUTATION } from "../../services/mutations/User";
-import { saveTokenInSecureStore } from "./LoginScreen";
+import { saveInSecureStore } from "./LoginScreen";
 /* import { Controller, useForm } from "react-hook-form";
 import InputGroup from "../../components/InputGroup"; */
 
@@ -49,6 +49,7 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
   // LOGOUT
   const logout = async () => {
     await SecureStore.deleteItemAsync("token");
+    await SecureStore.deleteItemAsync("user");
     resetUserState();
     navigation.navigate("Map");
   };
@@ -60,14 +61,14 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
     });
   }, []);
 
-  const [updateUser] = useMutation(UPDATE_USER_MUTATION, {
+  /* const [updateUser] = useMutation(UPDATE_USER_MUTATION, {
     variables: { data: {} },
     onCompleted: (data) => {
       console.log("data.updateUser", data.updateUser);
       saveTokenInSecureStore("token", data.getToken.token);
       setUser(data.updateUser);
     },
-  });
+  }); */
 
   /* const onSubmit = (formData: {}) => {
     updateUser({
@@ -99,12 +100,14 @@ const MyProfileScreen: React.FC = ({ navigation }: any) => {
             {user?.userFromDB.firstname || user?.userFromDB.email}
           </Text>
           <Text className="text-sm">
-            {user?.userFromDB?.role?.name === "freeUser"
+            {user?.userFromDB?.role?.name === "free_user"
               ? "Free user"
+              : user?.userFromDB?.role?.name === "super_user"
+              ? "Super user"
+              : user?.userFromDB?.role?.name === "city_admin"
+              ? "City admin"
               : user?.userFromDB?.role?.name === "admin"
-              ? "admin"
-              : user?.userFromDB?.role?.name === "paidUser"
-              ? "Paid User"
+              ? "Admin"
               : ""}
           </Text>
         </View>

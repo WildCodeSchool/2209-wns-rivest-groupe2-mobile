@@ -22,7 +22,7 @@ import { ROUTES } from "../../constants";
 import { Ionicons } from "@expo/vector-icons";
 import { GET_TOKEN } from "../../services/queries/UserQueries";
 
-export async function saveTokenInSecureStore(key: string, value: string) {
+export async function saveInSecureStore(key: string, value: string) {
   await SecureStore.setItemAsync(key, value);
 }
 
@@ -60,25 +60,25 @@ const LoginScreen = ({ navigation }) => {
   const [user, setUser] = useRecoilState(userState);
 
   // MUTATION - SUBMISSION
-  const [signIn] = useLazyQuery(GET_TOKEN, {
-    onCompleted(data) {
-      saveTokenInSecureStore("token", data.getToken.token);
-      setUser(data.getToken);
-      navigation.navigate("Profile");
-    },
-    onError(error: any) {
-      console.log(error);
-    },
-  });
+  const [signIn] = useLazyQuery(GET_TOKEN);
 
   const onSubmit: SubmitHandler<IUserForm> = async (fields: {
     email: string;
     password: string;
   }) => {
-    signIn({
+    await signIn({
       variables: {
         email: fields.email,
         password: fields.password,
+      },
+      onCompleted(data) {
+        saveInSecureStore("token", data.getToken.token);
+        saveInSecureStore("user", JSON.stringify(data.getToken));
+        setUser(data.getToken);
+        navigation.navigate("Profile");
+      },
+      onError(error: any) {
+        console.log(error);
       },
     });
   };
@@ -118,7 +118,6 @@ const LoginScreen = ({ navigation }) => {
                       onChangeText={onChange}
                       value={value}
                       placeholder="Email"
-                      error={!!error}
                       errorDetails={error?.message}
                     />
                   )}
@@ -136,7 +135,6 @@ const LoginScreen = ({ navigation }) => {
                         onChangeText={onChange}
                         value={value}
                         placeholder="Mot de passe"
-                        error={!!error}
                         errorDetails={error?.message}
                         password={passwordShown ? false : true}
                       />
@@ -259,3 +257,19 @@ const styles = StyleSheet.create({
 });
 
 export default LoginScreen;
+
+/* {"getToken": {
+  "__typename": "LoginResponse", 
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImNpdHkuYWRtaW5AZGV2ZWxvcC5jb20iLCJyb2xlIjoiY2l0eV9hZG1pbiIsImlhdCI6MTY5Mjg2ODc2OCwiZXhwIjoxNjkzNDczNTY4fQ.JC7t7vs2-qjrU7WWiySZFOsoV_biNkOy-I9iUk40VOs", 
+  "userFromDB": {
+    "__typename": "User", 
+    "email": "city.admin@develop.com", 
+    "firstname": "City", 
+    "id": 10, 
+    "isVerified": true, 
+    "lastname": "Admin", 
+    "profilePicture": null, 
+    "role": [Object], 
+    "username": "city.admin"
+  }
+}} */

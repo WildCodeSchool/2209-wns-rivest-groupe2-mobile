@@ -5,9 +5,10 @@ import {
   Image,
   SafeAreaView,
   ScrollView,
-  Button,
   Linking,
   Alert,
+  Button,
+  Pressable,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useState } from "react";
@@ -18,6 +19,7 @@ import { userState } from "../../atom/userAtom";
 import { GET_POI_BY_ID_QUERY } from "../../services/queries/Poi";
 import { IPOIData } from "../../types/IPoiData";
 import Constants from "expo-constants";
+import CustomButton from "../../components/Button";
 
 interface ItemScreenProps {
   route: {
@@ -49,7 +51,6 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
   }, [data]);
 
   const poi: IPOIData = queryData?.getPOIbyId;
-  console.log("poi", poi);
 
   const websiteUrl = poi?.websiteURL;
 
@@ -141,11 +142,11 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
           {poi?.websiteURL && (
             <View className="items-center flex-row space-x-4">
               <Ionicons name="link-outline" size={24} color="#D58574" />
-              <Button
-                title={poi?.websiteURL}
-                onPress={handlePressLink}
-                /* className="text-[#D58574] text-[13px] font-bold" */
-              />
+              <Pressable onPress={handlePressLink}>
+                <Text className="text-[#D58574] text-[13px] font-bold">
+                  {poi?.websiteURL}
+                </Text>
+              </Pressable>
             </View>
           )}
           <View className="items-center flex-row space-x-4 mb-4">
@@ -156,19 +157,14 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
                 : "Pas de notes disponibles"}
             </Text>
           </View>
-
-          {/* <View className="py-2 rounded-lg bg-[#06B2BE] items-center justify-center">
-            <Text className="text-xl font-semibold uppercase tracking-wider text-gray-100">
-              Réserver
-            </Text>
-          </View> */}
-          {user && (
-            <Button
-              title="Commentaires"
+          {user !== null && (
+            <CustomButton
               onPress={() =>
                 navigation.navigate("CommentScreen", { poiId: data })
               }
-            />
+            >
+              Commentaires
+            </CustomButton>
           )}
         </View>
       </ScrollView>

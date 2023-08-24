@@ -23,7 +23,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { CREATE_USER } from "../../services/mutations/User";
 
 // FN SECURE STORE
-async function saveTokenInSecureStore(key: string, value: string) {
+async function saveInSecureStore(key: string, value: string) {
   await SecureStore.setItemAsync(key, value);
 }
 
@@ -82,11 +82,10 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
   // MUTATION - SUBMISSION
   const [signUp] = useMutation(CREATE_USER, {
     onCompleted(data) {
-      console.log(data);
-      saveTokenInSecureStore("token", data.createUser.token);
+      saveInSecureStore("token", data.createUser.token);
+      saveInSecureStore("user", JSON.stringify(data.createUser));
       setUser(data.createUser);
-      navigation.navigate(ROUTES.MYPROFILE);
-      //navigation.navigate("Profile");
+      navigation.navigate("Profile");
     },
     onError(error: any) {
       console.log(error);
@@ -98,7 +97,6 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
     email: string;
     password: string;
   }) => {
-    console.log(fields);
     signUp({
       variables: {
         username: fields.username,
@@ -142,7 +140,6 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
                     onChangeText={onChange}
                     value={value}
                     placeholder="Email"
-                    error={!!error}
                     errorDetails={error?.message}
                   />
                 )}
@@ -159,7 +156,6 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
                     onChangeText={onChange}
                     value={value}
                     placeholder="Username"
-                    error={!!error}
                     errorDetails={error?.message}
                   />
                 )}
@@ -177,7 +173,6 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
                       onChangeText={onChange}
                       value={value}
                       placeholder="Mot de passe"
-                      error={!!error}
                       errorDetails={error?.message}
                       password={passwordShown ? false : true}
                     />
@@ -207,7 +202,6 @@ const RegisterScreen: React.FC = ({ navigation }: any) => {
                       onChangeText={onChange}
                       value={value}
                       placeholder="Confirmer le mot de passe"
-                      error={!!error}
                       errorDetails={error?.message}
                       password={passwordShownBis ? false : true}
                     />

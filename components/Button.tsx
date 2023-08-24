@@ -7,7 +7,7 @@ interface ButtonProps {
   onPress: () => void;
 }
 
-const Button: React.FC<ButtonProps> = ({ children, onPress }) => {
+const CustomButton: React.FC<ButtonProps> = ({ children, onPress }) => {
   return (
     <TouchableOpacity onPress={onPress}>
       <View>
@@ -24,7 +24,7 @@ const Button: React.FC<ButtonProps> = ({ children, onPress }) => {
   );
 };
 
-export default Button;
+export default CustomButton;
 
 const styles = StyleSheet.create({
   button: {
