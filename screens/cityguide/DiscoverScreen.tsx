@@ -5,6 +5,7 @@ import {
   ScrollView,
   ActivityIndicator,
   StyleSheet,
+  RefreshControl,
 } from "react-native";
 import React, {
   useCallback,
@@ -41,11 +42,9 @@ const DiscoverScreen = ({ navigation }) => {
   const [isFiltered, setIsFiltered] = useState<boolean>(false);
   const { city, setCity } = useContext(CityContext);
   const [user, setUser] = useRecoilState(userState);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     (async () => {
-      setLoading(true);
       let user;
       try {
         user = await SecureStore.getItemAsync("user");
@@ -54,9 +53,7 @@ const DiscoverScreen = ({ navigation }) => {
       }
       if (user) {
         setUser(JSON.parse(user));
-        setLoading(false);
       }
-      setLoading(false);
     })();
   }, []);
 
@@ -68,7 +65,7 @@ const DiscoverScreen = ({ navigation }) => {
   }, []);
 
   //FETCH DATA
-  const [getAllPoiInCity, { loading: poiLoading, error: poiError }] =
+  const [getAllPoiInCity, { loading: poiLoading, error: poiError, refetch }] =
     useLazyQuery(GET_POI_QUERY_BY_CITY, { variables: { cityId: city.id } });
   const [getCitiesData, { loading: cityLoading, error: cityError }] =
     useLazyQuery(GET_ALL_CITIES);
@@ -138,7 +135,11 @@ const DiscoverScreen = ({ navigation }) => {
           </Text>
         </View>
       </View>
-      <ScrollView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={poiLoading} onRefresh={refetch} />
+        }
+      >
         <View className="flex-row flex-wrap items-center justify-center px-8 mt-8">
           <MenuContainer
             key={"hotel"}

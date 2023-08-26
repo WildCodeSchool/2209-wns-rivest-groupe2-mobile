@@ -1,6 +1,11 @@
 import React, { useState } from "react";
 import { createStackNavigator } from "@react-navigation/stack";
-import { RegisterScreen, LoginScreen, MyProfileScreen } from "../screens/index";
+import {
+  RegisterScreen,
+  LoginScreen,
+  MyProfileScreen,
+  CameraScreen,
+} from "../screens/index";
 import { ROUTES } from "../constants/index";
 import { useRecoilState } from "recoil";
 import { userState } from "../atom/userAtom";
@@ -47,6 +52,7 @@ const ProfileNavigator: React.FC = ({ navigation }: any) => {
         <>
           <Stack.Screen name={ROUTES.MYPROFILE} component={MyProfileScreen} />
           <Stack.Screen name="DrawerNavigator" component={DrawerNavigator} />
+          <Stack.Screen name={ROUTES.CAMERA} component={CameraScreen} />
         </>
       ) : (
         <>

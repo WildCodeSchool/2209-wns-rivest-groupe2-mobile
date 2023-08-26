@@ -1,38 +1,131 @@
-import { TouchableOpacity, View, StyleSheet } from "react-native";
+import { TouchableOpacity, View, StyleSheet, Text } from "react-native";
 import { Avatar, Button, Modal, Portal } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { useState } from "react";
+import Constants from "expo-constants";
+import { useMutation } from "@apollo/client";
+import { UPDATE_USER_MUTATION } from "../services/mutations/User";
+import { useRecoilState } from "recoil";
+import { userState } from "../atom/userAtom";
+import { saveInSecureStore } from "../screens/cityguide/LoginScreen";
+import axios from "axios";
+import Toast from "react-native-root-toast";
+import { Platform } from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { ROUTES } from "../constants";
 
 function AvatarImagePicker() {
   const [modalOpen, setModalOpen] = useState(false);
+  const [user, setUser] = useRecoilState(userState);
+  const navigation = useNavigation();
 
-  const [image, setImage] = useState(null);
-  const launchImageLibrary = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  const { manifest } = Constants;
+  const image_url =
+    manifest?.debuggerHost &&
+    `http://${manifest.debuggerHost.split(":").shift()}:18000/images`;
 
-    if (!result.canceled) {
-      setImage(result.assets[0].uri);
+  const [updateAvatarImg] = useMutation(UPDATE_USER_MUTATION, {
+    context: {
+      headers: {
+        authorization: `Bearer ${user.token}`,
+      },
+    },
+    onCompleted(data) {
+      saveInSecureStore(
+        "user",
+        JSON.stringify({
+          token: user.token,
+          userFromDB: data.updateUser,
+        })
+      );
+      setUser({
+        __typename: "User",
+        token: user.token,
+        userFromDB: data.updateUser,
+      });
+    },
+  });
+
+  const updateBackendUrlImg = async (data: {
+    status: string;
+    filename: string;
+  }) => {
+    try {
+      await updateAvatarImg({
+        variables: {
+          data: {
+            id: user.userFromDB.id,
+            profilePicture: data.filename,
+          },
+        },
+      });
       setModalOpen(false);
+      Toast.show("Photo de profil ajoutée avec succès !", {
+        duration: Toast.durations.SHORT,
+        backgroundColor: "rgb(1, 162, 1)",
+        shadow: false,
+        position: 90,
+      });
+    } catch (error: any) {
+      console.error(error);
+      Toast.show(
+        `Erreur lors de l'ajout de la photo de profil: ${error.message}`,
+        {
+          duration: Toast.durations.SHORT,
+          backgroundColor: "#D58574",
+          shadow: false,
+          position: 90,
+        }
+      );
     }
   };
 
-  const launchCamera = async () => {
-    let result = await ImagePicker.launchCameraAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+  const uploadImageBackend = async (media: string) => {
+    const pictureData = {
+      name: new Date() + "_profile",
+      type: "image/jpg",
+      uri: Platform.OS !== "android" ? "file://" + media : media,
+    };
+    const formData = new FormData();
+    // @ts-ignore
+    formData.append("file", pictureData);
+
+    const postUrl = `/upload/avatars/${user.userFromDB.id}`;
+
+    try {
+      const { data } = await axios.post(`${image_url}${postUrl}`, formData, {
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${user.token}`,
+          "Content-type": "multipart/form-data",
+        },
+      });
+      await updateBackendUrlImg(data);
+    } catch (err) {
+      console.error(err);
+      Toast.show(
+        `Erreur lors de l'ajout de la photo de profil: ${err.message}`,
+        {
+          duration: Toast.durations.SHORT,
+          backgroundColor: "#D58574",
+          shadow: false,
+          position: 90,
+        }
+      );
+    }
+  };
+
+  const launchImageLibrary = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
       aspect: [4, 3],
-      quality: 1,
+      quality: 0.2,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0].uri);
-      setModalOpen(false);
+      await uploadImageBackend(result.assets[0].uri);
     }
   };
 
@@ -42,8 +135,11 @@ function AvatarImagePicker() {
         <Avatar.Image
           size={100}
           source={
-            image
-              ? { uri: image }
+            user?.userFromDB?.profilePicture &&
+            user.userFromDB.profilePicture.length > 0
+              ? {
+                  uri: `${image_url}${user.userFromDB.profilePicture}`,
+                }
               : require("../assets/images/no-image-icon.png")
           }
           className="bg-white"
@@ -52,7 +148,7 @@ function AvatarImagePicker() {
 
       <Portal>
         <Modal visible={modalOpen}>
-          <View>
+          <View style={styles.modalContent}>
             <Ionicons
               name="close"
               size={24}
@@ -63,11 +159,21 @@ function AvatarImagePicker() {
               textColor="#45C7C9"
               mode="elevated"
               onPress={launchImageLibrary}
+              style={styles.modalButton}
             >
-              Choose from Library
+              Choisir une photo depuis la bibliothèque
             </Button>
-            <Button textColor="#45C7C9" mode="elevated" onPress={launchCamera}>
-              Take a picture
+            <Button
+              textColor="#45C7C9"
+              mode="elevated"
+              style={styles.modalButton}
+              onPress={() => {
+                // @ts-ignore
+                navigation.navigate(ROUTES.CAMERA);
+                setModalOpen(false);
+              }}
+            >
+              Prendre une photo avec la caméra
             </Button>
           </View>
         </Modal>
@@ -75,6 +181,8 @@ function AvatarImagePicker() {
     </View>
   );
 }
+
+export default AvatarImagePicker;
 
 const styles = StyleSheet.create({
   modalToggle: {
@@ -89,12 +197,18 @@ const styles = StyleSheet.create({
   },
   modalClose: {
     marginTop: 10,
-
     marginBottom: 20,
+    backgroundColor: "#8C9EA6",
+    color: "white",
   },
   modalContent: {
-    flex: 1,
+    backgroundColor: "white",
+    paddingVertical: 30,
+    height: "100%",
+  },
+  modalButton: {
+    marginVertical: 15,
+    width: "80%",
+    marginLeft: "10%",
   },
 });
-
-export default AvatarImagePicker;

@@ -7,19 +7,23 @@ import {
   ScrollView,
   Linking,
   Alert,
-  Button,
   Pressable,
+  StyleSheet,
+  RefreshControl,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useCallback, useEffect, useState } from "react";
-import { useLazyQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import Toast from "react-native-root-toast";
 import { useRecoilValue } from "recoil";
 import { userState } from "../../atom/userAtom";
 import { GET_POI_BY_ID_QUERY } from "../../services/queries/Poi";
-import { IPOIData } from "../../types/IPoiData";
+import { IPOIData, OpeningHoursData } from "../../types/IPoiData";
 import Constants from "expo-constants";
 import CustomButton from "../../components/Button";
+import { GET_USER_FAVORITE_POI_QUERY } from "../../services/queries/FavoriteQueries";
+import { TOGGLE_FAVORITE_MUTATION } from "../../services/mutations/FavoriteMutation";
+import { unknownHours } from "../../services/helpers/POIDefaultDays";
 
 interface ItemScreenProps {
   route: {
@@ -33,26 +37,65 @@ interface ItemScreenProps {
 }
 
 const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
-  const data = route?.params.param;
+  const poiId = route?.params.param;
   const user = useRecoilValue(userState);
-  const [isRed, setIsRed] = useState(false);
+  const [isFavorite, setIsFavorite] = useState<boolean>(false);
+  const [openingHours, setOpeningHours] = useState<OpeningHoursData[]>([]);
 
   const { manifest } = Constants;
   const image_url =
     manifest?.debuggerHost &&
     `http://${manifest.debuggerHost.split(":").shift()}:18000/images`;
 
-  const [getPOIbyId, { data: queryData }] = useLazyQuery(GET_POI_BY_ID_QUERY);
+  const [getPOIbyId, { data: queryData, loading: poiLoading, refetch }] =
+    useLazyQuery(GET_POI_BY_ID_QUERY);
 
-  useEffect(() => {
-    if (data) {
-      getPOIbyId({ variables: { getPoIbyIdId: data } });
-    }
-  }, [data]);
+  const { data: favoriteData } = useQuery(GET_USER_FAVORITE_POI_QUERY, {
+    variables: { userId: user?.userFromDB.id },
+  });
+
+  const [toggleFavoriteMutation] = useMutation(TOGGLE_FAVORITE_MUTATION, {
+    variables: { userId: user.userFromDB.id, poiId },
+    context: {
+      headers: {
+        authorization: `Bearer ${user.token}`,
+      },
+    },
+    onCompleted: () => {
+      setIsFavorite((prevIsFavorite) => !prevIsFavorite);
+    },
+    refetchQueries: [
+      { query: GET_POI_BY_ID_QUERY, variables: { getPoIbyIdId: poiId } },
+      {
+        query: GET_USER_FAVORITE_POI_QUERY,
+        variables: { userId: user?.userFromDB.id },
+      },
+    ],
+  });
 
   const poi: IPOIData = queryData?.getPOIbyId;
 
   const websiteUrl = poi?.websiteURL;
+
+  useEffect(() => {
+    if (poiId) {
+      getPOIbyId({ variables: { getPoIbyIdId: poiId } });
+    }
+    if (favoriteData) {
+      const userFavorites = favoriteData.getUserFavorites.map(
+        (favorite) => favorite.pointOfInterest.id
+      );
+      setIsFavorite(userFavorites.includes(poiId));
+    }
+  }, [poiId, favoriteData]);
+
+  useEffect(() => {
+    if (poi) {
+      if (poi.openingHours && poi.openingHours.length > 0)
+        setOpeningHours(poi.openingHours.slice().sort((a, b) => a.id - b.id));
+      else setOpeningHours(unknownHours.slice().sort((a, b) => a.id - b.id));
+    }
+  }, [poi]);
 
   const handlePressLink = useCallback(async () => {
     const supported = await Linking.canOpenURL(websiteUrl);
@@ -64,16 +107,17 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
     }
   }, [websiteUrl]);
 
-  const handlePress = () => {
-    setIsRed(!isRed);
-    if (isRed !== true) {
+  const handlePressFavorite = async () => {
+    if (isFavorite !== true) {
+      await toggleFavoriteMutation();
       Toast.show("Ajouté aux vos favoris !", {
         duration: Toast.durations.SHORT,
-        backgroundColor: "#D58574",
+        backgroundColor: "rgb(1, 162, 1)",
         shadow: false,
         position: 90,
       });
     } else {
+      await toggleFavoriteMutation();
       Toast.show("Retiré des favoris !", {
         duration: Toast.durations.SHORT,
         backgroundColor: "#D58574",
@@ -86,7 +130,12 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
   return (
     <SafeAreaView className="flex-1 bg-white relative">
       {/* Image Section */}
-      <ScrollView className="flex-1 px-4 py-6">
+      <ScrollView
+        className="flex-1 px-4 py-6"
+        refreshControl={
+          <RefreshControl refreshing={poiLoading} onRefresh={refetch} />
+        }
+      >
         <View className="relative bg-white shadow-lg">
           <Image
             source={{
@@ -101,13 +150,13 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
           <View className="absolute top-5 right-5">
             {user !== null && (
               <TouchableOpacity
-                onPress={handlePress}
+                onPress={handlePressFavorite}
                 className="w-10 h-10 rounded-md items-center justify-center bg-[#06B2BE]"
               >
                 <Ionicons
                   name="heart-outline"
                   size={24}
-                  color={isRed ? "#D58574" : "#ffffff"}
+                  color={isFavorite ? "#D58574" : "#ffffff"}
                 />
               </TouchableOpacity>
             )}
@@ -136,9 +185,29 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
               {poi?.description}
             </Text>
           </View>
+          <View>
+            <View>
+              {openingHours.map((day) => (
+                <View key={day.id} style={styles.openingHours}>
+                  <Text className="text-[#8C9EA6] text-[13px] py-1 font-bold">
+                    {day.name}
+                  </Text>
+                  <Text className="text-[#8C9EA6] text-[13px]">
+                    {day.hoursOpen[0]}
+                    {day.hoursClose.length === 0
+                      ? ""
+                      : ` - ${day.hoursClose[0]}`}
+                    {day.hoursOpen.length === 2 &&
+                      day.hoursClose.length === 2 &&
+                      `, ${day.hoursOpen[1]} - ${day.hoursClose[1]}`}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
         </View>
 
-        <View className=" space-y-2 mt-4 bg-gray-100 rounded-2xl px-4 py-4">
+        <View className="space-y-2 mt-4 mb-12 bg-gray-100 rounded-2xl px-4 py-4">
           {poi?.websiteURL && (
             <View className="items-center flex-row space-x-4">
               <Ionicons name="link-outline" size={24} color="#D58574" />
@@ -160,7 +229,7 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
           {user !== null && (
             <CustomButton
               onPress={() =>
-                navigation.navigate("CommentScreen", { poiId: data })
+                navigation.navigate("CommentScreen", { poiId: poiId })
               }
             >
               Commentaires
@@ -173,3 +242,13 @@ const ItemScreen: React.FC<ItemScreenProps> = ({ route, navigation }) => {
 };
 
 export default ItemScreen;
+
+const styles = StyleSheet.create({
+  openingHours: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "85%",
+    marginLeft: "5%",
+  },
+});

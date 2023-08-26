@@ -6,11 +6,14 @@ export const UPDATE_USER_MUTATION = gql`
       id
       email
       username
-      type
       firstname
       lastname
-      hashedPassword
       profilePicture
+      role {
+        id
+        name
+      }
+      isVerified
     }
   }
 `;
@@ -34,4 +37,3 @@ export const CREATE_USER = gql`
     }
   }
 `;
-

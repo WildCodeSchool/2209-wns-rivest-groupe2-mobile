@@ -10,7 +10,6 @@ import {
   StyleSheet,
   ScrollView,
   Pressable,
-  Button,
   Modal,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
@@ -31,10 +30,9 @@ import {
 import tw from "tailwind-react-native-classnames";
 import Icon from "react-native-vector-icons/FontAwesome";
 import AntIcon from "react-native-vector-icons/AntDesign";
-import { Controller } from "react-hook-form";
 import moment from "moment";
 
-const CommentScreen = ({ route, navigation }) => {
+const CommentScreen = ({ route }) => {
   const [currentCommentRate, setCurrentCommentRate] = useState<rateNumbers>(
     rateNumbers.ONE
   );
@@ -44,7 +42,6 @@ const CommentScreen = ({ route, navigation }) => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
-  const containerStyle = { backgroundColor: "white", padding: 20 };
 
   const { poiId } = route.params;
 
@@ -243,8 +240,6 @@ const CommentScreen = ({ route, navigation }) => {
                   name="delete"
                   backgroundColor="#C5C5C5"
                   onPress={() => {
-                    console.log("comment", comment);
-                    console.log("comment id", comment.id);
                     setCurrentCommentId(comment.id);
                     setShowDeleteModal(true);
                   }}
